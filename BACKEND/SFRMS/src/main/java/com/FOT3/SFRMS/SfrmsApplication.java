@@ -1,13 +1,13 @@
-package com.FOT3.SFRM;
+package com.FOT3.SFRMS;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SfrmApplication {
+public class SfrmsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SfrmApplication.class, args);
+		SpringApplication.run(SfrmsApplication.class, args);
 	}
 
 }

@@ -1,10 +1,10 @@
-package com.FOT3.SFRM;
+package com.FOT3.SFRMS;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SfrmApplicationTests {
+class SfrmsApplicationTests {
 
 	@Test
 	void contextLoads() {
