@@ -3,6 +3,14 @@ import { Navbar, Button } from 'flowbite-react'
 import Logo from '../../assets/300x300.png'
 
 export default function Header() {
+  const isAuthenticated = !!localStorage.getItem('token'); // Check if user is logged in
+
+  const handleLogout = () => {
+    // Add your logout logic here, e.g., removing token and redirecting
+    localStorage.removeItem('token');
+    window.location.href = '/login'; // Redirect to login page
+  };
+
   return (
     <Navbar fluid rounded>
       <Navbar.Brand href="https://flowbite-react.com">
@@ -10,7 +18,9 @@ export default function Header() {
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">SunFly Room Booking System</span>
       </Navbar.Brand>
       <div className="flex md:order-2">
-        <Button>Log Out</Button>
+        {isAuthenticated && (
+          <Button onClick={handleLogout}>Log Out</Button> // Show only if logged in
+        )}
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
