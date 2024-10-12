@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import LoginPage from './components/auth/LoginPage';
+import RegistrationPage from './components/auth/RegisterPage';
+import UserService from './components/service/UsersService';
+import UpdateUser from './components/userspage/UpdateUser';
+import UserManagementPage from './components/userspage/UserManagementPage';
+import ProfilePage from './components/userspage/ProfilePage';
+import Header from './components/common/Header';
+import AdminSideBar from './components/sideBars/AdminSideBar';
+import UserSideBar from './components/sideBars/UserSidebar';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const location = useLocation(); // To determine current route
+
+  // Define routes where the admin sidebar should appear
+  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile"];
+
+  // Function to check if the current route is an admin route
+  const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
+
+  // Define routes where the user sidebar should appear
+  const userRoutes = ["/profile"];
+
+  // Function to check if the current route is a user route
+  const isUserRoute = userRoutes.some((route) => location.pathname.startsWith(route));
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    
+      <div className="App">
+        <Header />
+        <div className="flex">
+          {/* Conditionally render the admin sidebar */}
+          {UserService.adminOnly() && isAdminRoute && <AdminSideBar/>}
+
+          {/* Conditionally render the admin sidebar */}
+          {UserService.isUser() && isUserRoute && <UserSideBar/>}
+
+          {/* Main content area */}
+          <div className={`content ${UserService.adminOnly() && isAdminRoute ? 'w-full' : 'w-full'}`}>
+            <Routes>
+              <Route exact path="/" element={<LoginPage />} />
+              <Route exact path="/login" element={<LoginPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+
+              {/* Admin-only routes */}
+              {UserService.adminOnly() && (
+                <>
+                  <Route path="/register" element={<RegistrationPage />} />
+                  <Route path="/admin/user-management" element={<UserManagementPage />} />
+                  <Route path="/update-user/:userId" element={<UpdateUser />} />
+                </>
+              )}
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    
+  );
 }
 
-export default App
+export default App;
