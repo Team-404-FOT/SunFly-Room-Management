@@ -17,7 +17,8 @@ function UpdateUser() {
     const [userData, setUserData] = useState({
         name: '',
         email: '',
-        role: ''
+        role: '',
+        password: ''
     });
 
     useEffect(() => {
@@ -29,7 +30,7 @@ function UpdateUser() {
             const token = localStorage.getItem('token');
             const response = await UserService.getUserById(userId, token); // Pass userId to getUserById
             const { name, email, role } = response.ourUsers;
-            setUserData({ name, email, role });
+            setUserData({ name, email, role, password: ''});
         } catch (error) {
             console.error('Error fetching user data:', error);
         }
@@ -91,6 +92,19 @@ function UpdateUser() {
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter your email"
+                            />
+                        </div>
+
+                        {/* Password Field */}
+                        <div className="form-group">
+                            <label className="block text-sm font-medium text-gray-700">Password:</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={userData.password}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter new password"
                             />
                         </div>
 

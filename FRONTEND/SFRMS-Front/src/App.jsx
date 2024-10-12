@@ -8,6 +8,7 @@ import UserManagementPage from './components/userspage/UserManagementPage';
 import ProfilePage from './components/userspage/ProfilePage';
 import Header from './components/common/Header';
 import AdminSideBar from './components/sideBars/AdminSideBar';
+import UserSideBar from './components/sideBars/UserSidebar';
 
 
 function App() {
@@ -19,6 +20,12 @@ function App() {
   // Function to check if the current route is an admin route
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
 
+  // Define routes where the user sidebar should appear
+  const userRoutes = ["/profile"];
+
+  // Function to check if the current route is a user route
+  const isUserRoute = userRoutes.some((route) => location.pathname.startsWith(route));
+
   return (
     
       <div className="App">
@@ -26,6 +33,9 @@ function App() {
         <div className="flex">
           {/* Conditionally render the admin sidebar */}
           {UserService.adminOnly() && isAdminRoute && <AdminSideBar/>}
+
+          {/* Conditionally render the admin sidebar */}
+          {UserService.isUser() && isUserRoute && <UserSideBar/>}
 
           {/* Main content area */}
           <div className={`content ${UserService.adminOnly() && isAdminRoute ? 'w-full' : 'w-full'}`}>
