@@ -1,35 +1,55 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
-import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards } from "react-icons/hi";
+import { HiUser, HiUserAdd, HiUserGroup, HiTable } from "react-icons/hi";
+import { useLocation } from 'react-router-dom';
 
 export default function AdminSideBar() {
+  const location = useLocation();
+  const [activeItem, setActiveItem] = useState('');
+
+  // Update active item based on current location path
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location]);
+
   return (
-    <Sidebar className='mr-0'>
+    <Sidebar className='mr-0 h-screen'>
       <Sidebar.Items>
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="#" icon={HiChartPie}>
-            Dashboard
+          <Sidebar.Item
+            href="/register"
+            icon={HiUserAdd}
+            active={activeItem === '/register'}
+            onClick={() => setActiveItem('/register')}
+          >
+            Add User
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiViewBoards} label="Pro" labelColor="dark">
-            Kanban
+          <Sidebar.Item
+            href="/admin/user-management"
+            icon={HiUserGroup}
+            active={activeItem === '/admin/user-management'}
+            onClick={() => setActiveItem('/admin/user-management')}
+          >
+            Users Management
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiInbox} label="3">
-            Inbox
+          <Sidebar.Item
+            href="/profile"
+            icon={HiUser}
+            active={activeItem === '/profile'}
+            onClick={() => setActiveItem('/profile')}
+          >
+            Profile
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiUser}>
-            Users
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiShoppingBag}>
-            Products
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiArrowSmRight}>
-            Sign In
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiTable}>
+          <Sidebar.Item
+            href="/signup"
+            icon={HiTable}
+            active={activeItem === '/signup'}
+            onClick={() => setActiveItem('/signup')}
+          >
             Sign Up
           </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>
-  )
+  );
 }

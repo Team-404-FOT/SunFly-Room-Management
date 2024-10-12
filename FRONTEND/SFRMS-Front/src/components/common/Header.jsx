@@ -19,7 +19,7 @@ export default function Header() {
       </Navbar.Brand>
       <div className="flex md:order-2">
         {isAuthenticated && (
-          <Button onClick={handleLogout}>Log Out</Button> // Show only if logged in
+          <Button className=' bg-sky-600' onClick={handleLogout}>Log Out</Button> // Show only if logged in
         )}
         <Navbar.Toggle />
       </div>

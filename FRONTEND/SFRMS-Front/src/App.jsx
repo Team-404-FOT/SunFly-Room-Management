@@ -14,7 +14,7 @@ function App() {
   const location = useLocation(); // To determine current route
 
   // Define routes where the admin sidebar should appear
-  const adminRoutes = ["/admin/user-management", "/register", "/update-user/:userId", "/profile"];
+  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile"];
 
   // Function to check if the current route is an admin route
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
