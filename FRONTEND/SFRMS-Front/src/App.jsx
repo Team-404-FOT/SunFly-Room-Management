@@ -9,13 +9,16 @@ import ProfilePage from './components/userspage/ProfilePage';
 import Header from './components/common/Header';
 import AdminSideBar from './components/sideBars/AdminSideBar';
 import UserSideBar from './components/sideBars/UserSidebar';
+import AddCustomer from './components/customer/AddCustomer';
+import BookRoom from './components/Booking/BookRoom';
+import RegisteredCustomers from './components/customer/RegisteredCustomers';
 
 
 function App() {
   const location = useLocation(); // To determine current route
 
   // Define routes where the admin sidebar should appear
-  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile"];
+  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile", "/customer/add", "/booking", "/customer/RegisteredCustomers"];
 
   // Function to check if the current route is an admin route
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
@@ -43,6 +46,9 @@ function App() {
               <Route exact path="/" element={<LoginPage />} />
               <Route exact path="/login" element={<LoginPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/customer/add" element={<AddCustomer />} />
+              <Route path="/booking" element={<BookRoom />} /> 
+              <Route path="/customer/RegisteredCustomers" element={<RegisteredCustomers />} /> 
 
               {/* Admin-only routes */}
               {UserService.adminOnly() && (

@@ -16,6 +16,35 @@ export default function AdminSideBar() {
     <Sidebar className='mr-0 h-screen'>
       <Sidebar.Items>
         <Sidebar.ItemGroup>
+        <Sidebar.Collapse icon={HiUserGroup} label="Customers" active={activeItem.startsWith('/customer')}>
+  <Sidebar.Item
+    href="/customer/add"
+    icon={HiUserAdd}
+    active={activeItem === '/customer/add'}
+    onClick={() => setActiveItem('/customer/add')}
+  >
+    Add Customer
+  </Sidebar.Item>
+  <Sidebar.Item
+    href="/customer/RegisteredCustomers"
+    icon={HiUserAdd}
+    active={activeItem === '/customer/RegisteredCustomers'}
+    onClick={() => setActiveItem('/customer/RegisteredCustomers')}
+  >
+    Registered Customers
+  </Sidebar.Item>
+</Sidebar.Collapse>
+
+
+          <Sidebar.Item
+            href="/booking"
+            icon={HiUserAdd}
+            active={activeItem === '/booking'}
+            onClick={() => setActiveItem('/booking')}
+          >
+            Booking
+          </Sidebar.Item>
+
           <Sidebar.Item
             href="/register"
             icon={HiUserAdd}
@@ -38,6 +67,7 @@ export default function AdminSideBar() {
             active={activeItem === '/profile'}
             onClick={() => setActiveItem('/profile')}
           >
+            
             Profile
           </Sidebar.Item>
           <Sidebar.Item
