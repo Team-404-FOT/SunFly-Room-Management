@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "ourusers")
@@ -20,6 +21,12 @@ public class OurUsers implements UserDetails {
     private String name;
     private String password;
     private String role;
+
+    @OneToMany(mappedBy = "user") // A user can have many customers
+    private Set<Customers> customers;
+
+    @OneToMany(mappedBy = "user") // A user can have many bookings
+    private Set<Bookings> bookings;
 
 
     @Override
