@@ -3,7 +3,7 @@ package com.FOT3.SFRMS;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication 
+@SpringBootApplication
 public class SfrmsApplication {
 
 	public static void main(String[] args) {
