@@ -53,16 +53,30 @@ public class CustomersService {
     }
 
 
-    // Method to fetch data from the existing CustomerView
     public List<CustomerViewResponse> getAllCustomers() {
         String sql = "SELECT * FROM CustomerView";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             CustomerViewResponse customer = new CustomerViewResponse();
+            customer.setCusId(rs.getInt("cus_id"));  // Set cus_id
             customer.setFirstName(rs.getString("first_name"));
             customer.setLastName(rs.getString("last_name"));
             customer.setNic(rs.getString("nic"));
             customer.setPhoneNumber(rs.getString("phone_number"));
             return customer;
         });
+    }
+
+    // Method to delete registered customer by their NIC
+    public void deleteCustomerByNIC(String customerNIC) {
+        String sql = "CALL DeleteCustomerByNIC(?)";
+        jdbcTemplate.update(sql, customerNIC);
+    }
+
+
+
+    // Method to update customer information by cus_id
+    public String updateCustomerInfo(int cusId, String firstName, String lastName, String nic, String phoneNumber) {
+        String sql = "SELECT update_customer_info(?, ?, ?, ?, ?) AS result";
+        return jdbcTemplate.queryForObject(sql, new Object[]{cusId, firstName, lastName, nic, phoneNumber}, String.class);
     }
 }
