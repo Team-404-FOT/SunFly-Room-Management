@@ -59,11 +59,35 @@ public class CustomersController {
         return ResponseEntity.ok(matchedNICs);
     }
 
+
     @GetMapping("/viewAll")
     public ResponseEntity<List<CustomerViewResponse>> getAllCustomers() {
         List<CustomerViewResponse> customers = customersService.getAllCustomers();
         return ResponseEntity.ok(customers);
 
     }
+
+    // New endpoint to delete a customer by their NIC
+    @DeleteMapping("/delete/{nic}")
+    public ResponseEntity<String> deleteCustomer(@PathVariable String nic) {
+        customersService.deleteCustomerByNIC(nic);
+        return ResponseEntity.ok("Customer deleted successfully");
+    }
+
+
+    // Endpoint to update customer information
+    @PutMapping("/update")
+    public ResponseEntity<String> updateCustomer(@RequestBody CustomerRequest customerRequest) {
+        String result = customersService.updateCustomerInfo(
+                customerRequest.getCusId(),
+                customerRequest.getFirstName(),
+                customerRequest.getLastName(),
+                customerRequest.getNic(),
+                customerRequest.getPhoneNumber()
+        );
+        return ResponseEntity.ok(result);
+    }
+
+
 
 }
