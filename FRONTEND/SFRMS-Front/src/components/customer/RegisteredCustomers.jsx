@@ -1,28 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Pagination } from 'flowbite-react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
 function RegisteredCustomers() {
-  const customers = [
-    { firstName: 'Ashen', lastName: 'Kavindu', nic: '200064603572', phone: '0718045695' },
-    { firstName: 'Thisara', lastName: 'Bandara', nic: '200076543572', phone: '0752020695' },
-    { firstName: 'Chathumina', lastName: 'Dilashan', nic: '200035512072', phone: '0798077795' },
-    { firstName: 'Dinuka', lastName: 'Sandeepa', nic: '200099654372', phone: '0776545776' },
-    { firstName: 'Nimali', lastName: 'Fernando', nic: '200045678912', phone: '0712345678' },
-    { firstName: 'Kavindu', lastName: 'Perera', nic: '200098765432', phone: '0758765432' },
-    { firstName: 'Sashini', lastName: 'Jayasinghe', nic: '200123456789', phone: '0791234567' },
-    { firstName: 'Ravindu', lastName: 'Wickramasinghe', nic: '200156789012', phone: '0786543210' },
-    { firstName: 'Dilani', lastName: 'Perera', nic: '200067890123', phone: '0719876543' },
-    { firstName: 'Tharindu', lastName: 'Jayawardena', nic: '200098765678', phone: '0756543210' },
-    { firstName: 'Sanduni', lastName: 'Karunarathne', nic: '200043218765', phone: '0798765432' },
-    { firstName: 'Pramudi', lastName: 'Gunarathne', nic: '200012345678', phone: '0781234567' },
-
-  ];
-
-  const itemsPerPage = 7;  
+  const [customers, setCustomers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const itemsPerPage = 7;
 
+  // Fetch customers from the backend
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      const token = localStorage.getItem('token');
+  
+      try {
+        const response = await fetch('http://localhost:8080/customers/viewAll', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+  
+        if (response.status === 403) {
+          console.error('Access denied: You do not have permission to view this resource.');
+          return;
+        }
+  
+        const data = await response.json();
+        setCustomers(data);
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    };
+  
+    fetchCustomers();
+  }, []);
+  
   const totalPages = Math.ceil(customers.length / itemsPerPage);
 
   // Handle page change
@@ -47,16 +60,11 @@ function RegisteredCustomers() {
   };
 
   return (
-    <div className="overflow-x-auto ml-10 mr-10 mt-10 ">
-      <div className='mb-5'>
-        <form className="max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+    <div className="overflow-x-auto ml-10 mr-10 mt-10">
+      <div className="mb-5">
+        <form className="w-full max-w-md" onSubmit={(e) => e.preventDefault()}>
           <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
           <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-              </svg>
-            </div>
             <input 
               type="search" 
               id="default-search" 
@@ -92,7 +100,7 @@ function RegisteredCustomers() {
                 <Table.Cell className="text-white">{customer.firstName}</Table.Cell>
                 <Table.Cell className="text-white">{customer.lastName}</Table.Cell>
                 <Table.Cell className="text-white">{customer.nic}</Table.Cell>
-                <Table.Cell className="text-white">{customer.phone}</Table.Cell>
+                <Table.Cell className="text-white">{customer.phoneNumber}</Table.Cell>
                 <Table.Cell className="flex">
                   <FaEdit className="text-blue-500 mr-3 hover:text-blue-700 cursor-pointer text-lg" />
                   <FaTrash className="text-red-500 hover:text-red-700 cursor-pointer text-lg" />
