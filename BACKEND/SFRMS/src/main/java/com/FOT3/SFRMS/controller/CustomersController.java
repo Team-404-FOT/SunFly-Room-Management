@@ -1,14 +1,20 @@
 package com.FOT3.SFRMS.controller;
 
 import com.FOT3.SFRMS.dto.CustomerRequest;
+
 import com.FOT3.SFRMS.dto.CustomerResponse;
+
+import com.FOT3.SFRMS.dto.CustomerViewResponse;
+
 import com.FOT3.SFRMS.service.CustomersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/customers")
@@ -26,6 +32,7 @@ public class CustomersController {
                 customerRequest.getUserId());
         return ResponseEntity.ok("Customer added successfully");
     }
+
 
     // New endpoint to get all customer NIC numbers
     @GetMapping("/get-all-nics")
@@ -50,6 +57,12 @@ public class CustomersController {
     public ResponseEntity<List<String>> searchCustomerNIC(@RequestParam String query) {
         List<String> matchedNICs = customersService.searchCustomerNICs(query);
         return ResponseEntity.ok(matchedNICs);
+
+    @GetMapping("/viewAll")
+    public ResponseEntity<List<CustomerViewResponse>> getAllCustomers() {
+        List<CustomerViewResponse> customers = customersService.getAllCustomers();
+        return ResponseEntity.ok(customers);
+
     }
 
 }
