@@ -10,4 +10,5 @@ public class CustomerRequest {
     private String nic;
     private String phoneNumber;
     private int userId;
+    private int CusId;
 }

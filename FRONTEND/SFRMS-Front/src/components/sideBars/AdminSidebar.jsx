@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
-import { HiUser, HiUserAdd, HiUserGroup, HiTable } from "react-icons/hi";
+import { HiUser, HiUserAdd, HiUserGroup, HiTable,HiPlusCircle,HiClipboardList  } from "react-icons/hi";
 import { useLocation } from 'react-router-dom';
 
 export default function AdminSideBar() {
@@ -19,19 +19,19 @@ export default function AdminSideBar() {
         <Sidebar.Collapse icon={HiUserGroup} label="Customers" active={activeItem.startsWith('/customer')}>
   <Sidebar.Item
     href="/customer/add"
-    icon={HiUserAdd}
+    icon={HiPlusCircle}
     active={activeItem === '/customer/add'}
     onClick={() => setActiveItem('/customer/add')}
   >
-    Add Customer
+    Add
   </Sidebar.Item>
   <Sidebar.Item
     href="/customer/RegisteredCustomers"
-    icon={HiUserAdd}
+    icon={HiClipboardList }
     active={activeItem === '/customer/RegisteredCustomers'}
     onClick={() => setActiveItem('/customer/RegisteredCustomers')}
   >
-    Registered Customers
+    Registered
   </Sidebar.Item>
 </Sidebar.Collapse>
 
