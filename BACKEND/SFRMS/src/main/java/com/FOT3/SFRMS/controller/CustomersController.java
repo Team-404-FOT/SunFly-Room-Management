@@ -57,6 +57,7 @@ public class CustomersController {
     public ResponseEntity<List<String>> searchCustomerNIC(@RequestParam String query) {
         List<String> matchedNICs = customersService.searchCustomerNICs(query);
         return ResponseEntity.ok(matchedNICs);
+    }
 
     @GetMapping("/viewAll")
     public ResponseEntity<List<CustomerViewResponse>> getAllCustomers() {

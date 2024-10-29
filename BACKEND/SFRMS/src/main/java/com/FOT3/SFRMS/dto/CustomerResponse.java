@@ -1,13 +1,15 @@
 package com.FOT3.SFRMS.dto;
 
 public class CustomerResponse {
+    private int cusId;
     private String firstName;
     private String lastName;
     private String nic;
     private String phoneNumber;
 
     // Constructor
-    public CustomerResponse(String firstName, String lastName, String nic, String phoneNumber) {
+    public CustomerResponse(int cusId, String firstName, String lastName, String nic, String phoneNumber) {
+        this.cusId = cusId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.nic = nic;
@@ -15,6 +17,15 @@ public class CustomerResponse {
     }
 
     // Getters and Setters
+
+    public int getCusId() {
+        return cusId;
+    }
+
+    public void setCusId(int cusId) {
+        this.cusId = cusId;
+    }
+
     public String getFirstName() {
         return firstName;
     }

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Label, TextInput } from "flowbite-react";
+import React, { useState, useEffect } from 'react';
+import { Label, TextInput, Checkbox, Table, Button } from "flowbite-react";
 import axios from "axios";
 
 function BookRoom() {
@@ -11,6 +11,10 @@ function BookRoom() {
     nic: "",
     phoneNumber: "",
   });
+  const [rooms, setRooms] = useState([]); // State to store room data
+  const [roomType, setRoomType] = useState("");
+  const [acType, setAcType] = useState("");
+  const [checkInDate, setCheckInDate] = useState(""); // State for check-in date
 
   const token = localStorage.getItem("token");
 
@@ -18,6 +22,13 @@ function BookRoom() {
     console.error("No token found. User might not be authenticated.");
     return;
   }
+
+  useEffect(() => {
+    // Set check-in date to today's date by default
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+    setCheckInDate(formattedDate);
+  }, []);
 
   // Fetch matched NICs from the database as the user types
   const fetchNICs = async (query) => {
@@ -45,6 +56,45 @@ function BookRoom() {
       console.error("Error fetching customer details:", error);
     }
   };
+
+  // // Fetch room data
+  // const fetchRooms = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:8080/rooms/view", {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     setRooms(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching rooms:", error);
+  //   }
+  // };
+
+  //filterd rooms
+  const fetchFilteredRooms = async () => {
+    try {
+      const params = {};
+      if (roomType) params.roomType = roomType;
+      if (acType) params.acType = acType;
+
+      const response = await axios.get("http://localhost:8080/rooms/filter", {
+        params,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRooms(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching filtered rooms:", error);
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchRooms(); // Fetch rooms on component mount
+  // }, []);
+
+  useEffect(() => {
+    fetchFilteredRooms();
+  }, [roomType, acType]);
+
 
   const handleNicChange = (e) => {
     const value = e.target.value;
@@ -164,18 +214,21 @@ function BookRoom() {
 
                 <select
                   id="room_type"
+                  onChange={(e) => setRoomType(e.target.value)}
                   className="mt-2 w-1/3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
                 >
+                  <option value="">All Room Types</option>
                   <option value="single">Single Room</option>
                   <option value="double">Double Room</option>
-                  <option value="triple">Family Room</option>
+                  <option value="family">Family Room</option>
                 </select>
                 <div className=' mt-3 ml-20'>
                   <input
                     type="radio"
                     id="ac"
-                    name="room_type"
+                    name="ac_type"
                     value="ac"
+                    onChange={(e) => setAcType(e.target.value)}
                     className="text-blue-500 m-2"
                   />
                   <Label htmlFor="ac" value="  AC" />
@@ -184,8 +237,9 @@ function BookRoom() {
                   <input
                     type="radio"
                     id="non_ac"
-                    name="room_type"
-                    value="non_ac"
+                    name="ac_type"
+                    value="nonac"
+                    onChange={(e) => setAcType(e.target.value)}
                     className="text-blue-500 m-2 ml-14"
                   />
                   <Label htmlFor="non_ac" value="  Non A/C" />
@@ -199,6 +253,8 @@ function BookRoom() {
                   <TextInput
                     id="check_in"
                     type="date"
+                    value={checkInDate}
+                    onChange={(e) => setCheckInDate(e.target.value)}
                     className="mt-2 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
                   />
                 </div>
@@ -206,7 +262,40 @@ function BookRoom() {
               {/* available rooms */}
               <div className=' mt-4'>
                 <Label htmlFor="available_rooms" value="Available Rooms" />
-                Map the available rooms here
+
+                <div className="overflow-x-auto max-h-80 border border-gray-300 rounded-lg">
+                  {/* Room Table */}
+                  <Table hoverable>
+                    <Table.Head>
+                      <Table.HeadCell className="p-4">
+                      </Table.HeadCell>
+                      <Table.HeadCell>Room Number</Table.HeadCell>
+                      <Table.HeadCell>Room Type</Table.HeadCell>
+                      <Table.HeadCell>Description</Table.HeadCell>
+                      <Table.HeadCell>AC Type</Table.HeadCell>
+                      <Table.HeadCell>Price per Day</Table.HeadCell>
+                      <Table.HeadCell>Availability</Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body className="divide-y">
+                      {rooms.map((room) => (
+                        <Table.Row key={room.roomId} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell className="p-4">
+                            <Checkbox />
+                          </Table.Cell>
+                          <Table.Cell>{room.room_num}</Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                            {room.type}
+                          </Table.Cell>
+                          <Table.Cell>{room.description}</Table.Cell>
+                          <Table.Cell>{room.actype || "N/A"}</Table.Cell>
+                          <Table.Cell>Rs.{room.amount_per_day}</Table.Cell>
+                          <Table.Cell>{room.availability ? "Available" : "Unavailable"}</Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table>
+                </div>
+                  <Button className="mt-4" onClick={() => alert("Room booked successfully!")}>Book Room</Button>
               </div>
             </div>
           </form>
