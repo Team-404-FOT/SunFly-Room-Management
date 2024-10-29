@@ -46,6 +46,15 @@ export default function AdminSideBar() {
           </Sidebar.Item>
 
           <Sidebar.Item
+            href="/payment"
+            icon={HiUserAdd} // Replace with an appropriate icon
+            active={activeItem === '/payment'}
+            onClick={() => setActiveItem('/payment')}
+          >
+            Add Payment
+          </Sidebar.Item>
+
+          <Sidebar.Item
             href="/register"
             icon={HiUserAdd}
             active={activeItem === '/register'}
