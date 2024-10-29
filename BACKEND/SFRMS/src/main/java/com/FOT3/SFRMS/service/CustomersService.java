@@ -37,9 +37,10 @@ public class CustomersService {
 
     // New method to retrieve customer details by NIC
     public CustomerResponse findCustomerByNic(String nic) {
-        String sql = "SELECT first_name, last_name, nic, phone_number FROM customers WHERE nic = ?";
+        String sql = "SELECT cus_id, first_name, last_name, nic, phone_number FROM customers WHERE nic = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{nic}, (rs, rowNum) ->
                 new CustomerResponse(
+                        rs.getInt("cus_id"),
                         rs.getString("first_name"),
                         rs.getString("last_name"),
                         rs.getString("nic"),
