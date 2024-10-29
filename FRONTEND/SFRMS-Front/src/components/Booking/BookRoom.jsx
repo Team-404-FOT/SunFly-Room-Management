@@ -209,94 +209,107 @@ function BookRoom() {
           <h4 className="text-xl font-semibold text-gray-800 mb-4  ">Book Room</h4>
           <form className="flex items-center mb-4">
             <div className="w-full">
-              <Label htmlFor="room_type" value="Select Room Type" />
-              <div className='flex'>
+              <div className=' w-full'>
+                <Label htmlFor="room_type" value="Select Room Type" />
+                <div className='flex'>
 
-                <select
-                  id="room_type"
-                  onChange={(e) => setRoomType(e.target.value)}
-                  className="mt-2 w-1/3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
-                >
-                  <option value="">All Room Types</option>
-                  <option value="single">Single Room</option>
-                  <option value="double">Double Room</option>
-                  <option value="family">Family Room</option>
-                </select>
-                <div className=' mt-3 ml-20'>
-                  <input
-                    type="radio"
-                    id="ac"
-                    name="ac_type"
-                    value="ac"
-                    onChange={(e) => setAcType(e.target.value)}
-                    className="text-blue-500 m-2"
-                  />
-                  <Label htmlFor="ac" value="  AC" />
+                  <select
+                    id="room_type"
+                    onChange={(e) => {
+                      const selectedRoomType = e.target.value;
+                      setRoomType(selectedRoomType);
+
+                      // Deselect AC and Non-AC options when "All Room Types" is selected
+                      if (selectedRoomType === "") {
+                        setAcType(""); // Deselect both radio buttons
+                      }
+                    }}
+                    className="mt-2 w-1/3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
+                  >
+                    <option value="">All Room Types</option>
+                    <option value="single">Single Room</option>
+                    <option value="double">Double Room</option>
+                    <option value="family">Family Room</option>
+                  </select>
+                  <div className=' mt-3 ml-20'>
+                    <input
+                      type="radio"
+                      id="ac"
+                      name="ac_type"
+                      value="ac"
+                      onChange={(e) => setAcType(e.target.value)}
+                      checked={acType === "ac"} // Check if this radio button should be selected
+                      className="text-blue-500 m-2"
+                    />
+                    <Label htmlFor="ac" value="  AC" />
+                  </div>
+                  <div className='mt-3'>
+                    <input
+                      type="radio"
+                      id="non_ac"
+                      name="ac_type"
+                      value="nonac"
+                      onChange={(e) => setAcType(e.target.value)}
+                      checked={acType === "nonac"} // Check if this radio button should be selected
+                      className="text-blue-500 m-2 ml-14"
+                    />
+                    <Label htmlFor="non_ac" value="  Non A/C" />
+                  </div>
+
                 </div>
-                <div className='mt-3'>
-                  <input
-                    type="radio"
-                    id="non_ac"
-                    name="ac_type"
-                    value="nonac"
-                    onChange={(e) => setAcType(e.target.value)}
-                    className="text-blue-500 m-2 ml-14"
-                  />
-                  <Label htmlFor="non_ac" value="  Non A/C" />
+                <div className='flex gap-4 mt-4'>
+
+                  <div className='w-1/2'>
+                    <Label htmlFor="check_in" value="Check In Date" />
+                    <TextInput
+                      id="check_in"
+                      type="date"
+                      value={checkInDate}
+                      onChange={(e) => setCheckInDate(e.target.value)}
+                      className="mt-2 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
+                    />
+                  </div>
+                </div>
+                {/* available rooms */}
+                <div className=' mt-4'>
+                  <Label htmlFor="available_rooms" value="Available Rooms" />
+
+                  <div className="overflow-x-auto max-h-80 border border-gray-300 rounded-lg">
+                    {/* Room Table */}
+                    <Table hoverable>
+                      <Table.Head>
+                        <Table.HeadCell className="p-4">
+                        </Table.HeadCell>
+                        <Table.HeadCell>Room Number</Table.HeadCell>
+                        <Table.HeadCell>Room Type</Table.HeadCell>
+                        <Table.HeadCell>Description</Table.HeadCell>
+                        <Table.HeadCell>AC Type</Table.HeadCell>
+                        <Table.HeadCell>Price per Day</Table.HeadCell>
+                        <Table.HeadCell>Availability</Table.HeadCell>
+                      </Table.Head>
+                      <Table.Body className="divide-y">
+                        {rooms.map((room) => (
+                          <Table.Row key={room.roomId} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                            <Table.Cell className="p-4">
+                              <Checkbox />
+                            </Table.Cell>
+                            <Table.Cell>{room.room_num}</Table.Cell>
+                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                              {room.type}
+                            </Table.Cell>
+                            <Table.Cell>{room.description}</Table.Cell>
+                            <Table.Cell>{room.actype || "N/A"}</Table.Cell>
+                            <Table.Cell>Rs.{room.amount_per_day}</Table.Cell>
+                            <Table.Cell>{room.availability ? "Available" : "Unavailable"}</Table.Cell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table>
+                  </div>
                 </div>
 
               </div>
-              <div className='flex gap-4 mt-4'>
-
-                <div className='w-1/2'>
-                  <Label htmlFor="check_in" value="Check In Date" />
-                  <TextInput
-                    id="check_in"
-                    type="date"
-                    value={checkInDate}
-                    onChange={(e) => setCheckInDate(e.target.value)}
-                    className="mt-2 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
-                  />
-                </div>
-              </div>
-              {/* available rooms */}
-              <div className=' mt-4'>
-                <Label htmlFor="available_rooms" value="Available Rooms" />
-
-                <div className="overflow-x-auto max-h-80 border border-gray-300 rounded-lg">
-                  {/* Room Table */}
-                  <Table hoverable>
-                    <Table.Head>
-                      <Table.HeadCell className="p-4">
-                      </Table.HeadCell>
-                      <Table.HeadCell>Room Number</Table.HeadCell>
-                      <Table.HeadCell>Room Type</Table.HeadCell>
-                      <Table.HeadCell>Description</Table.HeadCell>
-                      <Table.HeadCell>AC Type</Table.HeadCell>
-                      <Table.HeadCell>Price per Day</Table.HeadCell>
-                      <Table.HeadCell>Availability</Table.HeadCell>
-                    </Table.Head>
-                    <Table.Body className="divide-y">
-                      {rooms.map((room) => (
-                        <Table.Row key={room.roomId} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                          <Table.Cell className="p-4">
-                            <Checkbox />
-                          </Table.Cell>
-                          <Table.Cell>{room.room_num}</Table.Cell>
-                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                            {room.type}
-                          </Table.Cell>
-                          <Table.Cell>{room.description}</Table.Cell>
-                          <Table.Cell>{room.actype || "N/A"}</Table.Cell>
-                          <Table.Cell>Rs.{room.amount_per_day}</Table.Cell>
-                          <Table.Cell>{room.availability ? "Available" : "Unavailable"}</Table.Cell>
-                        </Table.Row>
-                      ))}
-                    </Table.Body>
-                  </Table>
-                </div>
-                  <Button className="mt-4" onClick={() => alert("Room booked successfully!")}>Book Room</Button>
-              </div>
+              <Button className="mt-4" onClick={() => alert("Room booked successfully!")}>Book Room</Button>
             </div>
           </form>
         </div>
