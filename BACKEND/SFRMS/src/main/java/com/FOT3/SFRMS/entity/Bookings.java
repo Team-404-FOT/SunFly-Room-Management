@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "bookings")
@@ -15,8 +15,9 @@ public class Bookings {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bookingId;
-    private LocalDateTime bookingDateAndTime;
+    private LocalDate bookingDateAndTime;
     private String specialNote;
+    private boolean inBooking; //when add booking , you have set inBooking = true else inBooking = false.
 
     @ManyToOne // Many bookings can be associated with one user
     @JoinColumn(name = "userId", nullable = false)

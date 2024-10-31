@@ -6,10 +6,14 @@ import com.FOT3.SFRMS.dto.CustomerResponse;
 import com.FOT3.SFRMS.dto.CustomerViewResponse;
 
 import com.FOT3.SFRMS.repository.CustomersRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Map;
@@ -21,8 +25,6 @@ public class CustomersService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-//    @Autowired
-//    private CustomersRepository customersRepository;
 
     public void addNewCustomer(String firstName, String lastName, String nic, String phoneNumber, int userId) {
         String sql = "CALL AddNewCustomer(?, ?, ?, ?, ?)";
@@ -37,7 +39,7 @@ public class CustomersService {
 
     // New method to retrieve customer details by NIC
     public CustomerResponse findCustomerByNic(String nic) {
-        String sql = "SELECT cus_id, first_name, last_name, nic, phone_number FROM customers WHERE nic = ?";
+        String sql = "{CALL GetCustomerByNic(?)}";
         return jdbcTemplate.queryForObject(sql, new Object[]{nic}, (rs, rowNum) ->
                 new CustomerResponse(
                         rs.getInt("cus_id"),
@@ -47,10 +49,21 @@ public class CustomersService {
                         rs.getString("phone_number")
                 ));
     }
-    
+
     public List<String> searchCustomerNICs(String query) {
-        String sql = "SELECT nic FROM customers WHERE nic LIKE ?";
-        return jdbcTemplate.queryForList(sql, new Object[]{"%" + query + "%"}, String.class);
+        String sql = "SELECT SearchCustomerNICs(?)";
+        String jsonResult = jdbcTemplate.queryForObject(sql, new Object[]{query}, String.class);
+
+        // Parse JSON result into a list of strings
+        ObjectMapper mapper = new ObjectMapper();
+        List<String> nicList = new ArrayList<>();
+        try {
+            nicList = mapper.readValue(jsonResult, new TypeReference<List<String>>() {});
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return nicList;
     }
 
 

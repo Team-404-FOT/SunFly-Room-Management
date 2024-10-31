@@ -22,36 +22,28 @@ public class RoomsService {
     private JdbcTemplate jdbcTemplate;
 
     public List<Rooms> getAllRooms() {
-        String sql = "SELECT * FROM rooms";
+        String sql = "{CALL GetAllRooms()}";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Rooms.class));
     }
 
     public Rooms addRoom(Rooms room) {
-        String sql = "INSERT INTO rooms (room_num, type, actype, description,amount_per_day, availability) VALUES (?,?, ?, ?, ?, ?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String sql = "{CALL AddRoom(?, ?, ?, ?, ?, ?)}";
 
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"roomId"});
-                ps.setInt(1, room.getRoomNum());
-                ps.setString(2, room.getType());
-                ps.setString(3, room.getACtype());
-                ps.setString(4, room.getDescription());
-                ps.setFloat(5,room.getAmountPerDay());
-                ps.setBoolean(6, room.isAvailability());
-                return ps;
-            }
-        }, keyHolder);
+        jdbcTemplate.update(sql,
+                room.getRoomNum(),
+                room.getType(),
+                room.getACtype(),
+                room.getDescription(),
+                room.getAmountPerDay(),
+                room.isAvailability()
+        );
 
-        room.setRoomId(keyHolder.getKey().intValue());
         return room;
     }
 
 
     public List<Map<String, Object>> getFilteredRooms(String roomType, String acType) {
-        String sql = "SELECT * FROM rooms WHERE (type = ? OR ? IS NULL OR ? = '') AND (actype = ? OR ? IS NULL OR ? = '')";
-
-        return jdbcTemplate.queryForList(sql, roomType, roomType, roomType, acType, acType, acType);
+        String sql = "{CALL GetFilteredRooms(?, ?)}";
+        return jdbcTemplate.queryForList(sql, roomType, acType);
     }
 }
