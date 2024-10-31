@@ -25,11 +25,7 @@ public class CustomersController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addCustomer(@RequestBody CustomerRequest customerRequest) {
-        customersService.addNewCustomer(customerRequest.getFirstName(),
-                customerRequest.getLastName(),
-                customerRequest.getNic(),
-                customerRequest.getPhoneNumber(),
-                customerRequest.getUserId());
+        customersService.addNewCustomer(customerRequest.getFirstName(), customerRequest.getLastName(), customerRequest.getNic(), customerRequest.getPhoneNumber(), customerRequest.getUserId());
         return ResponseEntity.ok("Customer added successfully");
     }
 

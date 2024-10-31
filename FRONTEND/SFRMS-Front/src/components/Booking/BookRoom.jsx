@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Label, TextInput, Checkbox, Table, Button } from "flowbite-react";
+import { Label, TextInput, Checkbox, Table, Button, Modal } from "flowbite-react";
 import axios from "axios";
+import UserService from "../service/UsersService";
 
 function BookRoom() {
   const [nicQuery, setNicQuery] = useState("");
@@ -15,8 +16,16 @@ function BookRoom() {
   const [roomType, setRoomType] = useState("");
   const [acType, setAcType] = useState("");
   const [checkInDate, setCheckInDate] = useState(""); // State for check-in date
+  const [selectedRoom, setSelectedRoom] = useState({}); // State for selected room
+  const [specialNote, setSpecialNote] = useState(""); // State for special note
+  const [modalOpenSuccess, setModalOpenSuccess] = useState(false); // State for success modal
 
+  // Retrieve token from local storage
   const token = localStorage.getItem("token");
+
+  //model
+  const [modalOpenCustomer, setModalOpenCustomer] = useState(false);
+  const [modalOpenRoom, setModalOpenRoom] = useState(false);
 
   if (!token) {
     console.error("No token found. User might not be authenticated.");
@@ -57,19 +66,7 @@ function BookRoom() {
     }
   };
 
-  // // Fetch room data
-  // const fetchRooms = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:8080/rooms/view", {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     setRooms(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching rooms:", error);
-  //   }
-  // };
-
-  //filterd rooms
+  // Fetch rooms based on selected filters
   const fetchFilteredRooms = async () => {
     try {
       const params = {};
@@ -87,10 +84,6 @@ function BookRoom() {
     }
   };
 
-  // useEffect(() => {
-  //   fetchRooms(); // Fetch rooms on component mount
-  // }, []);
-
   useEffect(() => {
     fetchFilteredRooms();
   }, [roomType, acType]);
@@ -107,10 +100,83 @@ function BookRoom() {
     }
   };
 
+  const handleSpecialNoteChange = (e) => {
+    const value = e.target.value;
+    setSpecialNote(value);
+  };
+
   const handleNICSelect = (nic) => {
     setNicQuery(nic);
     setMatchedNICs([]);
     fetchCustomerDetails(nic);
+  };
+
+  const handleRoomSelection = (room) => {
+    setSelectedRoom(room);
+    console.log(room);
+  };
+
+  const handleBookRoom = async () => {
+    if (!customerDetails.cusId) {
+      setModalOpenCustomer(true); // Open customer modal
+      return;
+    }
+    if (!selectedRoom.room_id) {
+      setModalOpenRoom(true); // Open room modal
+      return;
+    }
+    try {
+      const userId = await getCurrentUserId(token);
+      if (!userId) {
+        console.error("Failed to retrieve user ID.");
+        return;
+      }
+
+      const bookingData = {
+        bookingDateAndTime: checkInDate,
+        specialNote: specialNote,
+        user: { id: userId },
+        customer: { cusId: customerDetails.cusId }, // Adjust based on your API's expected structure
+        room: { roomId: selectedRoom.room_id },
+        inBooking: true,
+      };
+
+      const response = await axios.post("http://localhost:8080/bookings/add", bookingData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 201) {
+        setModalOpenSuccess(true); // Show success modal
+      }
+    } catch (error) {
+      console.error("Error booking room:", error);
+      alert("Failed to book room. Please try again.");
+    }
+
+    // Clear form fields after booking
+    setNicQuery("");
+    setMatchedNICs([]);
+    setCustomerDetails({
+      firstName: "",
+      lastName: "",
+      nic: "",
+      phoneNumber: "",
+    });
+    setRoomType("");
+    setAcType("");
+    setSpecialNote("");
+    setSelectedRoom({});
+    fetchFilteredRooms();
+  };
+
+  const getCurrentUserId = async (token) => {
+    try {
+      const response = await UserService.getYourProfile(token);
+      return response.ourUsers.id;
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+      return null;
+    }
   };
 
   return (
@@ -122,7 +188,7 @@ function BookRoom() {
             <div className="w-full relative">
               <Label htmlFor="first_name" value="NIC/Passpot No." className='ps-10 p-2.5' />
               <TextInput
-                type="text"
+                type="number"
                 id="nic-search"
                 placeholder="Search Customer NIC/PP No."
                 value={nicQuery}
@@ -146,7 +212,7 @@ function BookRoom() {
               )}
             </div>
           </form>
-
+          {/* Customer Details Section */}
           <div className="items-center ml-3">
             <div>
               <div className="mb-2 block">
@@ -206,9 +272,10 @@ function BookRoom() {
       <div className="w-2/3 bg-gray-100 p-4">
         {/* Additional content for the right side */}
         <div className='flex flex-col gap-4 w-full'>
-          <h4 className="text-xl font-semibold text-gray-800 mb-4  ">Book Room</h4>
+          <h4 className="text-xl font-semibold text-gray-800 mb-4">Book Room</h4>
           <form className="flex items-center mb-4">
             <div className="w-full">
+
               <div className=' w-full'>
                 <Label htmlFor="room_type" value="Select Room Type" />
                 <div className='flex'>
@@ -268,6 +335,16 @@ function BookRoom() {
                       onChange={(e) => setCheckInDate(e.target.value)}
                       className="mt-2 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
                     />
+                  </div >
+                  <div className=' w-full'>
+                    <Label htmlFor="special_note" value="Special Note" />
+                    <TextInput
+                      id="special_note"
+                      type="text"
+                      value={specialNote}
+                      onChange={handleSpecialNoteChange}
+                      className="mt-2 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 block "
+                    />
                   </div>
                 </div>
                 {/* available rooms */}
@@ -285,13 +362,16 @@ function BookRoom() {
                         <Table.HeadCell>Description</Table.HeadCell>
                         <Table.HeadCell>AC Type</Table.HeadCell>
                         <Table.HeadCell>Price per Day</Table.HeadCell>
-                        <Table.HeadCell>Availability</Table.HeadCell>
                       </Table.Head>
                       <Table.Body className="divide-y">
                         {rooms.map((room) => (
-                          <Table.Row key={room.roomId} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Row
+                            key={room.roomId}
+                            onClick={() => handleRoomSelection(room)}
+                            className={`${selectedRoom.room_id === room.room_id ? "bg-sky-300" : ""} hover:bg-sky-300`}
+                            style={{ cursor: "pointer" }}
+                          >
                             <Table.Cell className="p-4">
-                              <Checkbox />
                             </Table.Cell>
                             <Table.Cell>{room.room_num}</Table.Cell>
                             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
@@ -300,7 +380,6 @@ function BookRoom() {
                             <Table.Cell>{room.description}</Table.Cell>
                             <Table.Cell>{room.actype || "N/A"}</Table.Cell>
                             <Table.Cell>Rs.{room.amount_per_day}</Table.Cell>
-                            <Table.Cell>{room.availability ? "Available" : "Unavailable"}</Table.Cell>
                           </Table.Row>
                         ))}
                       </Table.Body>
@@ -309,12 +388,68 @@ function BookRoom() {
                 </div>
 
               </div>
-              <Button className="mt-4" onClick={() => alert("Room booked successfully!")}>Book Room</Button>
+              <Button className="mt-4  bg-sky-600" onClick={handleBookRoom} >Book Room</Button>
             </div>
           </form>
         </div>
 
       </div>
+      {/* Modal for customer alert */}
+      <Modal show={modalOpenCustomer} onClose={() => setModalOpenCustomer(false)} className="bg-red-100 ">
+        <Modal.Header>
+          <span className="text-red-500 text-2xl">
+            Warning: Please Select a Customer
+          </span>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg">
+            You must select a customer before booking a room. Please go back and select a customer.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="failure" onClick={() => setModalOpenCustomer(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal for room alert */}
+      <Modal show={modalOpenRoom} onClose={() => setModalOpenRoom(false)} className="bg-red-100 ">
+        <Modal.Header>
+          <span className="text-red-500 text-2xl">
+            Warning: Please Select a Room
+          </span>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg">
+            You must select a Room before booking a room. Please go back and select a Room.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="failure" onClick={() => setModalOpenRoom(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal for success alert */}
+      <Modal show={modalOpenSuccess} onClose={() => setModalOpenSuccess(false)} className="bg-green-100 ">
+        <Modal.Header>
+          <span className="text-green-500 text-2xl">
+            Room Booked Successfully
+          </span>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg">
+            You have successfully booked the room. Please proceed to the next step.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="success" onClick={() => setModalOpenSuccess(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

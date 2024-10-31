@@ -1,0 +1,30 @@
+package com.FOT3.SFRMS.controller;
+
+import com.FOT3.SFRMS.entity.Bookings;
+import com.FOT3.SFRMS.service.BookingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/bookings")
+public class BookingController {
+
+    private final BookingService bookingService;
+
+    @Autowired
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<String> addBooking(@RequestBody Bookings booking) {
+        try {
+            bookingService.addBooking(booking);
+            return new ResponseEntity<>("Booking added successfully.", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to add booking: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+}

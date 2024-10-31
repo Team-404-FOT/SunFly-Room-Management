@@ -14,10 +14,10 @@ public class Rooms {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int roomId;
     private int roomNum;
-    private String type;
-    private String ACtype;
+    private String type; //Single, double, family
+    private String ACtype; //ac , nonac
     private String description;
-    private float amountPerDay;
+    private float amountPerDay; //
     private boolean availability; //if booked set false, else set true
 
 }
