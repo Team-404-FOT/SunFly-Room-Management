@@ -1,56 +1,51 @@
 import React, { useState } from 'react';
-import { Label, TextInput, Dropdown, Button } from "flowbite-react";
+import { Label, TextInput, Dropdown, Button, Table } from "flowbite-react";
 
 function AddPay() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [customerDetails, setCustomerDetails] = useState(null);
-  const [paymentView, setPaymentView] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const [paymentType, setPaymentType] = useState('');
   const [cashPaid, setCashPaid] = useState('');
   const [balance, setBalance] = useState(null);
 
-  // Dummy customer and room data
-  const dummyCustomerData = {
-    firstName: "John",
-    lastName: "Doe",
-    nic: "123456789V",
-    roomNumber: "R001",
-    roomType: "Double Room",
-    checkIn: "2024-10-01",
-    checkOut: "2024-10-10",
-    price: 1000 // Total price for the stay
-  };
+  // Dummy data for booked rooms
+  const bookedRooms = [
+    { id: 1, roomNumber: "R001", customerName: "John Doe", roomType: "Double", price: 1000, checkIn: "2024-10-01", checkOut: "2024-10-10" },
+    { id: 2, roomNumber: "R002", customerName: "Jane Smith", roomType: "Single", price: 700, checkIn: "2024-10-05", checkOut: "2024-10-12" },
+    // Add more dummy data as needed
+  ];
 
-  // Mock API Call for search
   const handleSearch = () => {
-    if (searchTerm) {
-      setCustomerDetails(dummyCustomerData);
-    } else {
-      setCustomerDetails(null);
-    }
+    const result = bookedRooms.find(room => room.roomNumber === searchTerm || room.customerName.toLowerCase().includes(searchTerm.toLowerCase()));
+    setSelectedRoom(result || null);
   };
 
   const calculateBalance = () => {
-    if (cashPaid) {
-      const total = dummyCustomerData.price; // Using dummy total price
-      setBalance(cashPaid - total);
+    if (cashPaid && selectedRoom) {
+      setBalance(cashPaid - selectedRoom.price);
     }
   };
 
   const handlePayment = () => {
-    console.log("Payment made!");
+    if (selectedRoom) {
+      console.log("Payment made for room:", selectedRoom.roomNumber);
+      setSelectedRoom(null);
+      setPaymentType('');
+      setCashPaid('');
+      setBalance(null);
+    }
   };
 
   return (
-    <div className="flex max-w-5xl mx-auto p-8 bg-gray-50 rounded-lg shadow-lg gap-8">
-      {/* Left Side */}
-      <div className="flex flex-col gap-6 w-2/5">
+    <div className="flex h-screen p-8 bg-gray-100"> {/* Light gray background for the whole page */}
+      {/* Left Side: Search and Booked Rooms */}
+      <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 rounded-lg shadow-lg overflow-y-auto"> {/* Changed to bg-gray-200 */}
         
         {/* Search Section */}
-        <form className="flex items-center gap-4" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
+        <form className="flex items-center gap-4 mb-6" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
           <TextInput
             id="simple-search"
-            placeholder="Search by room number or name..."
+            placeholder="Search by room number or customer name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             required
@@ -59,37 +54,77 @@ function AddPay() {
           <Button type="submit" color="blue">Search</Button>
         </form>
 
-        {/* Customer Details */}
-        {customerDetails && (
-          <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm space-y-2">
-            <h3 className="font-semibold text-lg">Customer Details</h3>
-            <p className="text-gray-700">Customer: {customerDetails.firstName} {customerDetails.lastName}</p>
-            <p className="text-gray-700">NIC: {customerDetails.nic}</p>
-            <Button onClick={() => setPaymentView(true)} color="success" size="sm">Proceed to Payment</Button>
-          </div>
-        )}
+        {/* Booked Rooms List */}
+        <h3 className="font-semibold text-lg mb-4">Booked Rooms</h3>
+        <Table className="w-full text-left">
+          <Table.Head>
+            <Table.HeadCell>Room No</Table.HeadCell>
+            <Table.HeadCell>Customer</Table.HeadCell>
+            <Table.HeadCell>Room Type</Table.HeadCell>
+            <Table.HeadCell>Actions</Table.HeadCell>
+          </Table.Head>
+          <Table.Body className="divide-y">
+            {bookedRooms.map((room) => (
+              <Table.Row key={room.id} className="bg-white">
+                <Table.Cell>{room.roomNumber}</Table.Cell>
+                <Table.Cell>{room.customerName}</Table.Cell>
+                <Table.Cell>{room.roomType}</Table.Cell>
+                <Table.Cell>
+                  <Button size="xs" onClick={() => setSelectedRoom(room)} color="success">Checkout</Button>
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
       </div>
 
-      {/* Payment Window */}
-      {paymentView && (
-        <div className="flex flex-col gap-6 w-3/5 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-          <h3 className="font-semibold text-lg">Payment Details</h3>
+      {/* Right Side: Payment Window */}
+      {selectedRoom && (
+        <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 border border-gray-200 rounded-lg shadow-lg overflow-y-auto"> {/* Changed to bg-gray-200 */}
+          <h3 className="font-semibold text-lg">Payment Details for Room {selectedRoom.roomNumber}</h3>
           
           {/* Room and Payment Information */}
-          <div className="grid grid-cols-2 gap-4">
-            <p><strong>Room No:</strong> {customerDetails.roomNumber}</p>
-            <p><strong>Room Type:</strong> {customerDetails.roomType}</p>
-            <p><strong>Check-in Date:</strong> {customerDetails.checkIn}</p>
-            <p><strong>Check-out Date:</strong> {customerDetails.checkOut}</p>
-            <p><strong>Total Price:</strong> ${customerDetails.price}</p>
+          <div className="space-y-2">
+            <Label value="Customer" />
+            <TextInput
+              readOnly
+              value={selectedRoom.customerName}
+              className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
+            <Label value="Room Type" />
+            <TextInput
+              readOnly
+              value={selectedRoom.roomType}
+              className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
+            <Label value="Check-in Date" />
+            <TextInput
+              readOnly
+              value={selectedRoom.checkIn}
+              className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
+            <Label value="Check-out Date" />
+            <TextInput
+              readOnly
+              value={selectedRoom.checkOut}
+              className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
+            <Label value="Total Price" />
+            <TextInput
+              readOnly
+              value={`$${selectedRoom.price}`}
+              className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
           </div>
 
           {/* Payment Options */}
-          <div className="space-y-4">
-            <Dropdown label="Select Payment Method" dismissOnClick={false} className="w-48">
-              <Dropdown.Item onClick={() => setPaymentType('Card')}>Card</Dropdown.Item>
-              <Dropdown.Item onClick={() => setPaymentType('Cash')}>Cash</Dropdown.Item>
-            </Dropdown>
+          <div className="w-full space-y-4">
+            <div className="relative w-1/2"> {/* Adjusting the width of dropdown */}
+              <Dropdown label="Select Payment Method" dismissOnClick={true}>
+                <Dropdown.Item onClick={() => setPaymentType('Card')}>Card</Dropdown.Item>
+                <Dropdown.Item onClick={() => setPaymentType('Cash')}>Cash</Dropdown.Item>
+              </Dropdown>
+            </div>
           </div>
 
           {/* Cash Payment Section */}
@@ -100,11 +135,14 @@ function AddPay() {
                 id="cashPaid"
                 type="number"
                 placeholder="Enter amount paid"
-                onChange={(e) => setCashPaid(e.target.value)}
+                onChange={(e) => {
+                  setCashPaid(e.target.value);
+                  setBalance(null); // Reset balance when cash paid changes
+                }}
                 className="border border-gray-300 rounded-lg"
               />
               <Button onClick={calculateBalance} color="blue" size="sm">Calculate Balance</Button>
-              {balance !== null && (
+              {cashPaid && balance !== null && (
                 <p className="text-gray-700 font-semibold">Balance: ${balance}</p>
               )}
             </div>
