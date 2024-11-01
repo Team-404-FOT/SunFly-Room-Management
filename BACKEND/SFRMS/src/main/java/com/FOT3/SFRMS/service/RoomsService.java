@@ -5,14 +5,7 @@ import com.FOT3.SFRMS.repository.RoomsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +46,8 @@ public class RoomsService implements RoomService{
 
 
     public List<Map<String, Object>> getFilteredRooms(String roomType, String acType) {
-        String sql = "{CALL GetFilteredRooms(?, ?)}";
-        return jdbcTemplate.queryForList(sql, roomType, acType);
+        String sql = "SELECT * FROM rooms WHERE (type = ? OR ? IS NULL OR ? = '') AND (actype = ? OR ? IS NULL OR ? = '') AND (availability = true)";
+
+        return jdbcTemplate.queryForList(sql, roomType, roomType, roomType, acType, acType, acType);
     }
 }

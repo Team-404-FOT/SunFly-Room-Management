@@ -13,8 +13,10 @@ import AddCustomer from './components/customer/AddCustomer';
 import BookRoom from './components/Booking/BookRoom';
 import RegisteredCustomers from './components/customer/RegisteredCustomers';
 import AddPay from './components/Payment/AddPay';
+import BookingDetails from './components/Booking/BookingDetails';
 import Addrooms from './components/Rooms/Addrooms';
 import RoomManagement from './components/Rooms/RoomManagement';
+
 
 
 
@@ -22,7 +24,20 @@ function App() {
   const location = useLocation(); // To determine current route
 
   // Define routes where the admin sidebar should appear
-  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile", "/customer/add", "/booking","/payment","/Rooms/Addrooms","/Rooms/RoomManagement","/customer/RegisteredCustomers"];
+  const adminRoutes = [
+    "/admin/user-management",
+    "/register",
+    "/update-user/",
+    "/profile",
+    "/customer/add",
+    "/booking/add",
+    "/booking",
+    "/payment",
+    "/Rooms/Addrooms",
+    "/Rooms/RoomManagement",
+    "/customer/RegisteredCustomers",
+    "/booking/registeredBookings"
+];
 
   // Function to check if the current route is an admin route
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
@@ -51,11 +66,12 @@ function App() {
               <Route exact path="/login" element={<LoginPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/customer/add" element={<AddCustomer />} />
-              <Route path="/booking" element={<BookRoom />} /> 
+              <Route path="/booking/add" element={<BookRoom />} /> 
               <Route path="/payment" element={<AddPay />} />
               <Route path="/Rooms/Addrooms" element={<Addrooms />} />
               <Route path="/Rooms/RoomManagement" element={<RoomManagement />} />
               <Route path="/customer/RegisteredCustomers" element={<RegisteredCustomers />} /> 
+              <Route path="/booking/registeredBookings" element={<BookingDetails/>} />
 
               {/* Admin-only routes */}
               {UserService.adminOnly() && (
@@ -63,6 +79,7 @@ function App() {
                   <Route path="/register" element={<RegistrationPage />} />
                   <Route path="/admin/user-management" element={<UserManagementPage />} />
                   <Route path="/update-user/:userId" element={<UpdateUser />} />
+                  
                 </>
               )}
               <Route path="*" element={<Navigate to="/login" />} />

@@ -1,11 +1,14 @@
 package com.FOT3.SFRMS.controller;
 
+import com.FOT3.SFRMS.dto.ActiveBookingDetails;
 import com.FOT3.SFRMS.entity.Bookings;
 import com.FOT3.SFRMS.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bookings")
@@ -26,5 +29,11 @@ public class BookingController {
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to add booking: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<ActiveBookingDetails>> getActiveBookings() {
+        List<ActiveBookingDetails> activeBookings = bookingService.getActiveBookings();
+        return ResponseEntity.ok(activeBookings);
     }
 }
