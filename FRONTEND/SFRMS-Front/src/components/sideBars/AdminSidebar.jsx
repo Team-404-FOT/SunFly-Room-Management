@@ -53,6 +53,24 @@ export default function AdminSideBar() {
           >
             Add Payment
           </Sidebar.Item>
+          <Sidebar.Item
+            href="/Rooms/Addrooms"
+            icon={HiUserAdd} // Replace with an appropriate icon
+            active={activeItem === '/Rooms/Addrooms'}
+            onClick={() => setActiveItem('/Rooms/Addrooms')}
+          >
+            Add Rooms
+          </Sidebar.Item>
+          
+          
+          <Sidebar.Item
+            href="/Rooms/RoomManagement"
+            icon={HiUserAdd} // Replace with an appropriate icon
+            active={activeItem === '/Rooms/RoomManagement'}
+            onClick={() => setActiveItem('/Rooms/RoomManagement')}
+          >
+            Rooms Management
+          </Sidebar.Item>
 
           <Sidebar.Item
             href="/register"

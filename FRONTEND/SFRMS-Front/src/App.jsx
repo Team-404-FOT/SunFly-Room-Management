@@ -13,14 +13,16 @@ import AddCustomer from './components/customer/AddCustomer';
 import BookRoom from './components/Booking/BookRoom';
 import RegisteredCustomers from './components/customer/RegisteredCustomers';
 import AddPay from './components/Payment/AddPay';
- 
+import Addrooms from './components/Rooms/Addrooms';
+import RoomManagement from './components/Rooms/RoomManagement';
+
 
 
 function App() {
   const location = useLocation(); // To determine current route
 
   // Define routes where the admin sidebar should appear
-  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile", "/customer/add", "/booking","/payment", "/customer/RegisteredCustomers"];
+  const adminRoutes = ["/admin/user-management", "/register", "/update-user/", "/profile", "/customer/add", "/booking","/payment","/Rooms/Addrooms","/Rooms/RoomManagement","/customer/RegisteredCustomers"];
 
   // Function to check if the current route is an admin route
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
@@ -51,6 +53,8 @@ function App() {
               <Route path="/customer/add" element={<AddCustomer />} />
               <Route path="/booking" element={<BookRoom />} /> 
               <Route path="/payment" element={<AddPay />} />
+              <Route path="/Rooms/Addrooms" element={<Addrooms />} />
+              <Route path="/Rooms/RoomManagement" element={<RoomManagement />} />
               <Route path="/customer/RegisteredCustomers" element={<RegisteredCustomers />} /> 
 
               {/* Admin-only routes */}

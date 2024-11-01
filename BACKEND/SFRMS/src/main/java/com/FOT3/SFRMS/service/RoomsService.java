@@ -1,6 +1,7 @@
 package com.FOT3.SFRMS.service;
 
 import com.FOT3.SFRMS.entity.Rooms;
+import com.FOT3.SFRMS.repository.RoomsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class RoomsService {
+public class RoomsService implements RoomService{
+
+
+    @Autowired
+    private RoomsRepo roomsRepo;
+    @Override
+    public Rooms saveRooms(Rooms room) {
+        return roomsRepo.save(room);
+    }
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

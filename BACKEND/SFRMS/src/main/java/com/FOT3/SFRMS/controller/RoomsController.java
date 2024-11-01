@@ -2,6 +2,7 @@ package com.FOT3.SFRMS.controller;
 
 
 import com.FOT3.SFRMS.entity.Rooms;
+import com.FOT3.SFRMS.repository.RoomsRepo;
 import com.FOT3.SFRMS.service.RoomsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +17,14 @@ import java.util.Map;
 public class RoomsController {
 
     @Autowired
-    RoomsService roomsService;
+     RoomsService roomsService;
 
     @GetMapping("/view")
     public ResponseEntity<List<Rooms>> getAllRooms() {
         List<Rooms> rooms = roomsService.getAllRooms();
         return ResponseEntity.ok(rooms);
     }
+
 
     @PostMapping("/add")
     public ResponseEntity<Rooms> addRoom(@RequestBody Rooms room) {
