@@ -15,7 +15,7 @@ public class Bookings {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bookingId;
-    private LocalDate bookingDateAndTime;
+    private LocalDate bookingDateAndTime; //only date
     private String specialNote;
     private boolean inBooking; //when add booking , you have set inBooking = true else inBooking = false.
 
@@ -30,5 +30,4 @@ public class Bookings {
     @ManyToOne // Many bookings can be associated with one room
     @JoinColumn(name = "roomId", nullable = false)
     private Rooms room; // This will hold the room booked
-
 }
