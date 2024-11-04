@@ -10,14 +10,27 @@ function AddPay() {
 
   // Dummy data for booked rooms
   const bookedRooms = [
-    { id: 1, roomNumber: "R001", customerName: "John Doe", roomType: "Double", price: 1000, checkIn: "2024-10-01", checkOut: "2024-10-10" },
-    { id: 2, roomNumber: "R002", customerName: "Jane Smith", roomType: "Single", price: 700, checkIn: "2024-10-05", checkOut: "2024-10-12" },
+    { id: 1, roomNumber: "R001", customerName: "John Doe", roomType: "Double", acType: "AC", price: 1000, checkIn: "2024-10-01", checkOut: "" },
+    { id: 2, roomNumber: "R002", customerName: "Jane Smith", roomType: "Single", acType: "Non-AC", price: 700, checkIn: "2024-10-05", checkOut: "" },
     // Add more dummy data as needed
   ];
 
+  // Function to get the current date in the format YYYY-MM-DD
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSearch = () => {
     const result = bookedRooms.find(room => room.roomNumber === searchTerm || room.customerName.toLowerCase().includes(searchTerm.toLowerCase()));
-    setSelectedRoom(result || null);
+    if (result) {
+      setSelectedRoom({ ...result, checkOut: getCurrentDate() }); // Set current date as checkout date
+    } else {
+      setSelectedRoom(null);
+    }
   };
 
   const calculateBalance = () => {
@@ -37,9 +50,9 @@ function AddPay() {
   };
 
   return (
-    <div className="flex h-screen p-8 bg-gray-100"> {/* Light gray background for the whole page */}
+    <div className="flex h-screen p-8 bg-gray-100">
       {/* Left Side: Search and Booked Rooms */}
-      <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 rounded-lg shadow-lg overflow-y-auto"> {/* Changed to bg-gray-200 */}
+      <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 rounded-lg shadow-lg overflow-y-auto">
         
         {/* Search Section */}
         <form className="flex items-center gap-4 mb-6" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
@@ -61,6 +74,7 @@ function AddPay() {
             <Table.HeadCell>Room No</Table.HeadCell>
             <Table.HeadCell>Customer</Table.HeadCell>
             <Table.HeadCell>Room Type</Table.HeadCell>
+            <Table.HeadCell>AC Type</Table.HeadCell>
             <Table.HeadCell>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
@@ -69,8 +83,9 @@ function AddPay() {
                 <Table.Cell>{room.roomNumber}</Table.Cell>
                 <Table.Cell>{room.customerName}</Table.Cell>
                 <Table.Cell>{room.roomType}</Table.Cell>
+                <Table.Cell>{room.acType}</Table.Cell>
                 <Table.Cell>
-                  <Button size="xs" onClick={() => setSelectedRoom(room)} color="success">Checkout</Button>
+                  <Button size="xs" onClick={() => setSelectedRoom({ ...room, checkOut: getCurrentDate() })} color="success">Checkout</Button>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -80,7 +95,7 @@ function AddPay() {
 
       {/* Right Side: Payment Window */}
       {selectedRoom && (
-        <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 border border-gray-200 rounded-lg shadow-lg overflow-y-auto"> {/* Changed to bg-gray-200 */}
+        <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 border border-gray-200 rounded-lg shadow-lg overflow-y-auto">
           <h3 className="font-semibold text-lg">Payment Details for Room {selectedRoom.roomNumber}</h3>
           
           {/* Room and Payment Information */}
@@ -95,6 +110,12 @@ function AddPay() {
             <TextInput
               readOnly
               value={selectedRoom.roomType}
+              className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+            />
+            <Label value="AC Type" />
+            <TextInput
+              readOnly
+              value={selectedRoom.acType}
               className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
             />
             <Label value="Check-in Date" />
@@ -119,7 +140,7 @@ function AddPay() {
 
           {/* Payment Options */}
           <div className="w-full space-y-4">
-            <div className="relative w-1/2"> {/* Adjusting the width of dropdown */}
+            <div className="relative w-1/2">
               <Dropdown label="Select Payment Method" dismissOnClick={true}>
                 <Dropdown.Item onClick={() => setPaymentType('Card')}>Card</Dropdown.Item>
                 <Dropdown.Item onClick={() => setPaymentType('Cash')}>Cash</Dropdown.Item>
@@ -137,7 +158,7 @@ function AddPay() {
                 placeholder="Enter amount paid"
                 onChange={(e) => {
                   setCashPaid(e.target.value);
-                  setBalance(null); // Reset balance when cash paid changes
+                  setBalance(null);
                 }}
                 className="border border-gray-300 rounded-lg"
               />
