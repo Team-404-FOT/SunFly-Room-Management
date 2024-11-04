@@ -1,6 +1,7 @@
 package com.FOT3.SFRMS.service;
 
 import com.FOT3.SFRMS.dto.ActiveBookingDetails;
+import com.FOT3.SFRMS.dto.PaymentRequest;
 import com.FOT3.SFRMS.entity.Bookings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -52,5 +53,18 @@ public class BookingService {
         bookingDetails.setAcType(rs.getString("actype"));
         bookingDetails.setSpecialNote(rs.getString("special_note"));
         return bookingDetails;
+    }
+
+    public void addPayment(PaymentRequest paymentRequest) {
+        String sql = "{CALL add_payment(?, ?, ?, ?, ?, ?, ?, ?)}";
+
+        jdbcTemplate.update(sql, paymentRequest.getBookingId(),
+                paymentRequest.getType(),
+                paymentRequest.getAcType(),
+                paymentRequest.getCusName(),
+                paymentRequest.getPaymentMethod(),
+                paymentRequest.getCheckIn(),
+                paymentRequest.getCheckOut(),
+                paymentRequest.getAmount());
     }
 }

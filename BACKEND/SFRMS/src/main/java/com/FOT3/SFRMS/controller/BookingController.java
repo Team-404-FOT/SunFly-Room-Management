@@ -1,6 +1,7 @@
 package com.FOT3.SFRMS.controller;
 
 import com.FOT3.SFRMS.dto.ActiveBookingDetails;
+import com.FOT3.SFRMS.dto.PaymentRequest;
 import com.FOT3.SFRMS.entity.Bookings;
 import com.FOT3.SFRMS.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,11 @@ public class BookingController {
     public ResponseEntity<List<ActiveBookingDetails>> getActiveBookings() {
         List<ActiveBookingDetails> activeBookings = bookingService.getActiveBookings();
         return ResponseEntity.ok(activeBookings);
+    }
+
+    @PostMapping("/add-payment")
+    public ResponseEntity<String> addPayment(@RequestBody PaymentRequest paymentRequest) {
+        bookingService.addPayment(paymentRequest);
+        return ResponseEntity.ok("Payment added successfully!");
     }
 }
