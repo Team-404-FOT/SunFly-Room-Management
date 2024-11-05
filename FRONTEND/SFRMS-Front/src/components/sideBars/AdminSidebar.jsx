@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
-import { HiUser, HiUserAdd, HiUserGroup, HiTable, HiPlusCircle, HiClipboardList } from "react-icons/hi";
+import { HiUser, HiUserAdd, HiUserGroup, HiTable, HiPlusCircle, HiClipboardList,HiOutlineHome, HiCog, HiPlus } from 'react-icons/hi'; 
 import { useLocation } from 'react-router-dom';
 
 export default function AdminSideBar() {
+
   const location = useLocation();
   const [activeItem, setActiveItem] = useState('');
 
-  // Update active item based on current location path
   useEffect(() => {
     setActiveItem(location.pathname);
   }, [location]);
@@ -55,31 +55,32 @@ export default function AdminSideBar() {
             </Sidebar.Item>
           </Sidebar.Collapse>
 
+          <Sidebar.Collapse icon={HiOutlineHome} label="Rooms" active={activeItem.startsWith('/booking')}>
+            <Sidebar.Item
+              href="/Rooms/RoomManagement"
+              icon={HiCog} 
+              active={activeItem === '/Rooms/RoomManagement'}
+              onClick={() => setActiveItem('/Rooms/RoomManagement')}
+            >
+              Room Management 
+            </Sidebar.Item>
+            <Sidebar.Item
+              href="/Rooms/Addrooms"
+              icon={HiPlus} 
+              active={activeItem === '/Rooms/Addrooms'}
+              onClick={() => setActiveItem('/Rooms/Addrooms')}
+            >
+              Create Rooms 
+            </Sidebar.Item>
+          </Sidebar.Collapse>
+
           <Sidebar.Item
             href="/payment"
-            icon={HiUserAdd} // Replace with an appropriate icon
+            icon={HiUserAdd} 
             active={activeItem === '/payment'}
             onClick={() => setActiveItem('/payment')}
           >
             Add Payment
-          </Sidebar.Item>
-          <Sidebar.Item
-            href="/Rooms/Addrooms"
-            icon={HiUserAdd} // Replace with an appropriate icon
-            active={activeItem === '/Rooms/Addrooms'}
-            onClick={() => setActiveItem('/Rooms/Addrooms')}
-          >
-            Add Rooms
-          </Sidebar.Item>
-          
-          
-          <Sidebar.Item
-            href="/Rooms/RoomManagement"
-            icon={HiUserAdd} // Replace with an appropriate icon
-            active={activeItem === '/Rooms/RoomManagement'}
-            onClick={() => setActiveItem('/Rooms/RoomManagement')}
-          >
-            Rooms Management
           </Sidebar.Item>
 
           <Sidebar.Item
