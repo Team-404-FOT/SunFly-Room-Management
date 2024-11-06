@@ -72,20 +72,15 @@ public class RoomsService implements RoomService {
 
         try {
             // Validate the input room
-            System.out.println("Validating the room object.");
             if (room == null) {
                 throw new ServiceException("Room object cannot be null.");
             }
-            System.out.println("Room object is valid.");
 
             // Check if the room exists before updating
-            System.out.println("Checking if room exists with ID: " + room.getRoomNum());
-            Rooms existingRoom = roomsRepo.findById(room.getRoomNum())
-                    .orElseThrow(() -> new ServiceException("Room not found with ID: " + room.getRoomNum()));
-            System.out.println("Room found: " + existingRoom);
+            Rooms existingRoom = roomsRepo.findById(room.getRoomId())
+                    .orElseThrow(() -> new ServiceException("Room not found with ID: " + room.getRoomId()));
 
             // Execute the update operation
-            System.out.println("Executing update operation for room ID: " + room.getRoomNum());
             jdbcTemplate.update(sql,
                     room.getRoomNum(),
                     room.getType(),
@@ -94,25 +89,19 @@ public class RoomsService implements RoomService {
                     room.getAmountPerDay(),
                     room.isAvailability()
             );
-            System.out.println("Update operation completed successfully.");
 
             // Return the updated room object
-            System.out.println("Retrieving the updated room from the database.");
-            return roomsRepo.findById(room.getRoomNum())
+            return roomsRepo.findById(room.getRoomId())
                     .orElseThrow(() -> new ServiceException("Failed to retrieve updated room."));
         } catch (DataAccessException e) {
             String errorMessage = e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : "Database access error.";
-            System.err.println("DataAccessException: " + errorMessage);
             throw new ServiceException("Failed to update room: " + errorMessage, e);
         } catch (ServiceException e) {
-            System.err.println("ServiceException: " + e.getMessage());
-            throw e; // Rethrow the ServiceException for higher-level handling
+            throw e;
         } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
             throw new ServiceException("An unexpected error occurred while updating room: " + e.getMessage(), e);
         }
     }
-
 
 
     public void deleteRoom(Integer roomNum) {
