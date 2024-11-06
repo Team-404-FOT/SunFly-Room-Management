@@ -37,10 +37,12 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/user/**").hasAuthority("USER")
                         .requestMatchers("/adminuser/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers("/bookings/**").permitAll()
                         .requestMatchers("/customers/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/rooms/delete/**").hasAuthority("ADMIN")
                         .requestMatchers("/rooms/update/**").hasAuthority("ADMIN")
                         .requestMatchers("/bookings/add-payment").permitAll()
+
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
