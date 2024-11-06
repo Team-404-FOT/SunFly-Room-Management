@@ -1,55 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Pagination, Button, Modal, Alert } from 'flowbite-react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import { HiInformationCircle } from 'react-icons/hi';
-import EditModal from './Updaterooms'; // Import your EditModal component
-import AddRoom from './Addrooms'; // Import your AddRoom component
+import { useNavigate } from 'react-router-dom';
+
+import RoomDetails from './RoomDetails';
+import EditRoom from './EditRoom'; 
 
 function RoomManagement() {
   const [rooms, setRooms] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [roomToEdit, setRoomToEdit] = useState(null);
-  const [showAddRoom, setShowAddRoom] = useState(false); // State to toggle add room modal
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [roomDetails, setRoomDetails] = useState(null);
+  
   const itemsPerPage = 7;
+  const baseURL = 'http://localhost:8080/rooms'; 
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('http://localhost:8080/Rooms/viewAll', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        if (response.status === 403) {
-          console.error('Access denied: You do not have permission to view this resource.');
-          return;
-        }
-
-        const data = await response.json();
-        setRooms(data);
-      } catch (error) {
-        console.error('Error fetching rooms:', error);
-      }
-    };
-
     fetchRooms();
   }, []);
 
-  const totalPages = Math.ceil(rooms.length / itemsPerPage);
+  const fetchRooms = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${baseURL}/viewAll`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
 
-  const onPageChange = (page) => {
-    setCurrentPage(page);
+      if (response.ok) {
+        const data = await response.json();
+        setRooms(data);
+      } else {
+        console.error('Failed to fetch rooms');
+      }
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    }
   };
 
+  const totalPages = Math.ceil(rooms.length / itemsPerPage);
+  const onPageChange = (page) => setCurrentPage(page);
+  
   const filteredRooms = rooms.filter(room =>
-    room.roomNum.includes(searchTerm) || room.roomType.includes(searchTerm)
+    room.roomNum.toString().includes(searchTerm) || room.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastRoom = currentPage * itemsPerPage;
@@ -63,22 +63,20 @@ function RoomManagement() {
 
   const handleDeleteClick = (roomNum) => {
     setRoomToDelete(roomNum);
-    setShowModal(true);
+    setShowDeleteModal(true);
   };
 
   const deleteRoom = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:8080/Rooms/delete/${roomToDelete}`, {
+      const response = await fetch(`${baseURL}/delete/${roomToDelete}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
 
       if (response.ok) {
         setRooms(rooms.filter(room => room.roomNum !== roomToDelete));
-        setShowModal(false);
+        setShowDeleteModal(false);
       } else {
         console.error('Failed to delete room');
       }
@@ -92,10 +90,16 @@ function RoomManagement() {
     setShowEditModal(true);
   };
 
-  const handleEditSubmit = async (updatedRoom) => {
+  const handleViewDetails = (room) => {
+    setRoomDetails(room);
+    setShowDetailsModal(true);
+  };
+
+  const updateRoom = async (updatedRoom) => {
     const token = localStorage.getItem('token');
+
     try {
-      const response = await fetch(`http://localhost:8080/rooms/update`, {
+      const response = await fetch(`${baseURL}/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,20 +109,19 @@ function RoomManagement() {
       });
 
       if (response.ok) {
-        setRooms(rooms.map(rm => 
-          rm.roomNum === updatedRoom.roomNum ? updatedRoom : rm
-        ));
-        setShowEditModal(false);
+        // Update local state
+        const roomIndex = rooms.findIndex(room => room.roomNum === updatedRoom.roomNum);
+        const newRooms = [...rooms];
+        newRooms[roomIndex] = updatedRoom; 
+        setRooms(newRooms); 
+        setShowEditModal(false); 
       } else {
-        console.error('Failed to update room');
+        const errorData = await response.text();
+        console.error('Update failed:', errorData);
       }
     } catch (error) {
       console.error('Error updating room:', error);
     }
-  };
-
-  const toggleAddRoom = () => {
-    setShowAddRoom(!showAddRoom);
   };
 
   return (
@@ -132,13 +135,13 @@ function RoomManagement() {
               id="default-search" 
               value={searchTerm}
               onChange={handleSearchChange}
-              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
               placeholder="Search By Room Number or Type" 
               required 
             />
           </div>
         </form>
-        <Button onClick={toggleAddRoom}>Add Room</Button>
+        <Button onClick={() => navigate('/Rooms/Addrooms')}>Add Room</Button>
       </div>
 
       <div>
@@ -146,19 +149,21 @@ function RoomManagement() {
           <Table.Head className="text-black">
             <Table.HeadCell>Room Number</Table.HeadCell>
             <Table.HeadCell>Room Type</Table.HeadCell>
+            <Table.HeadCell>AC Type</Table.HeadCell>
             <Table.HeadCell>Amount per Day</Table.HeadCell>
             <Table.HeadCell>Availability</Table.HeadCell>
-            <Table.HeadCell>Action</Table.HeadCell>
+            <Table.HeadCell>Actions</Table.HeadCell>
           </Table.Head>
-
           <Table.Body className="divide-y divide-gray-700">
             {currentRooms.map((room, index) => (
-              <Table.Row key={index} className="bg-gray-800 hover:bg-gray-700">
-                <Table.Cell className="text-white">{room.roomNum}</Table.Cell>
-                <Table.Cell className="text-white">{room.roomType}</Table.Cell>
-                <Table.Cell className="text-white">{room.amountPerDay}</Table.Cell>
-                <Table.Cell className="text-white">{room.availability ? 'Available' : 'Not Available'}</Table.Cell>
+              <Table.Row key={index} className="hover:bg-gray-200">
+                <Table.Cell>{room.roomNum}</Table.Cell>
+                <Table.Cell>{room.type}</Table.Cell>
+                <Table.Cell>{room.actype}</Table.Cell>
+                <Table.Cell>Rs. {room.amountPerDay}</Table.Cell>
+                <Table.Cell>{room.availability ? 'Available' : 'Not Available'}</Table.Cell>
                 <Table.Cell className="flex">
+                  <FaEye className="text-green-500 mr-3 hover:text-green-700 cursor-pointer text-lg" onClick={() => handleViewDetails(room)} />
                   <FaEdit className="text-blue-500 mr-3 hover:text-blue-700 cursor-pointer text-lg" onClick={() => handleEditClick(room)} />
                   <FaTrash className="text-red-500 hover:text-blue-700 cursor-pointer text-lg" onClick={() => handleDeleteClick(room.roomNum)} />
                 </Table.Cell>
@@ -172,13 +177,14 @@ function RoomManagement() {
       <div className="flex justify-center my-4">
         <Pagination
           currentPage={currentPage}
-          totalPages={Math.ceil(filteredRooms.length / itemsPerPage)}
+          totalPages={totalPages}
           onPageChange={onPageChange}
           showIcons
         />
       </div>
 
-      <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} size="md" onClose={() => setShowDeleteModal(false)} popup>
         <Modal.Header />
         <Modal.Body>
           <div className="text-center">
@@ -190,7 +196,7 @@ function RoomManagement() {
               <Button color="failure" onClick={deleteRoom}>
                 {"Yes, I'm sure"}
               </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
+              <Button color="gray" onClick={() => setShowDeleteModal(false)}>
                 No, cancel
               </Button>
             </div>
@@ -198,19 +204,26 @@ function RoomManagement() {
         </Modal.Body>
       </Modal>
 
-      <EditModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSubmit={handleEditSubmit}
-        selectedRoom={roomToEdit}
-      />
+      {/* Edit Room Modal using EditRoom Component */}
+      <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
+        <Modal.Header>Edit Room</Modal.Header>
+        <Modal.Body>
+          <EditRoom
+            room={roomToEdit}
+            setRoom={setRoomToEdit}
+            onUpdate={updateRoom} 
+            closeModal={() => setShowEditModal(false)}
+          />
+        </Modal.Body>
+      </Modal>
 
-      {showAddRoom && (
-        <AddRoom onClose={toggleAddRoom} onSubmit={(newRoom) => {
-          setRooms([...rooms, newRoom]);
-          toggleAddRoom(); // Close modal after adding
-        }} />
-      )}
+      {/* Room Details Modal using RoomDetails Component */}
+      <Modal show={showDetailsModal} onClose={() => setShowDetailsModal(false)}>
+        <Modal.Header>Room Details</Modal.Header>
+        <Modal.Body>
+          <RoomDetails room={roomDetails} />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

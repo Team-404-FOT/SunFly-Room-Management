@@ -1,28 +1,35 @@
 package com.FOT3.SFRMS.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*; // Import JPA annotations
+import lombok.Data; // Lombok for generating getters and setters
 
 @Entity
-@Table(name = "rooms")
-@Data
+@Table(name = "rooms") // Specify the table name in the database
+@Data // Lombok annotation to generate boilerplate code (getters, setters, etc.)
 public class Rooms {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int roomId;
-    private int roomNum;
-    private String type; //Single, double, family
-    private String ACtype; //ac , nonac
-    private String description;
-    private float amountPerDay; //
-    private boolean availability; //if booked set false, else set true
 
+    @Column(name = "room_num")
+    private int roomNum;
+    private String type;
+    private String actype;
+    private String description;
+    private float amountPerDay;
+    private boolean availability;
 
     public Rooms() {
+    }
 
+    public Rooms(int roomNum, String type, String actype, float amountPerDay, boolean availability, String description) {
+        this.roomNum = roomNum;
+        this.type = type;
+        this.actype = actype;
+        this.amountPerDay = amountPerDay;
+        this.availability = availability;
+        this.description = description;
     }
 
     public int getRoomId() {
@@ -49,12 +56,12 @@ public class Rooms {
         this.type = type;
     }
 
-    public String getACtype() {
-        return ACtype;
+    public String getActype() {
+        return actype;
     }
 
-    public void setACtype(String ACtype) {
-        this.ACtype = ACtype;
+    public void setActype(String actype) {
+        this.actype = actype;
     }
 
     public String getDescription() {

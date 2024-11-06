@@ -3,14 +3,15 @@ import { Button, Label, TextInput, Alert } from 'flowbite-react';
 import { HiInformationCircle } from 'react-icons/hi';
 
 function AddRoom() {
+  
   const [roomNum, setRoomNum] = useState('');
   const [roomType, setRoomType] = useState('');
   const [acType, setAcType] = useState('');
   const [amountPerDay, setAmountPerDay] = useState('');
   const [availability, setAvailability] = useState(true);
-  const [description, setDescription] = useState(''); // New state for Room Description
-  const [successMessage, setSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [description, setDescription] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [timeoutId, setTimeoutId] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -18,46 +19,46 @@ function AddRoom() {
 
     const token = localStorage.getItem('token');
 
-    // Increase the amountPerDay by 1000 before submission
-    const updatedAmountPerDay = parseInt(amountPerDay); 
+    const parsedAmountPerDay = parseFloat(amountPerDay);
+    if (isNaN(parsedAmountPerDay) || parsedAmountPerDay <= 0) {
+        setErrorMessage('Please enter a valid amount greater than zero.');
+        return;
+    }
 
     const roomData = {
-      roomNum,
-      roomType,
-      acType,
-      amountPerDay: updatedAmountPerDay,
-      availability,
-      description, // Include Room Description in the data
+        roomNum: parseInt(roomNum), 
+        type: roomType,
+        actype: acType,
+        amountPerDay: parsedAmountPerDay,
+        availability,
+        description,
     };
 
     try {
-      const response = await fetch('http://localhost:8080/rooms/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(roomData),
-      });
+        const response = await fetch('http://localhost:8080/rooms/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(roomData),
+        });
 
-      if (response.status === 409) {
-        setErrorMessage(true);
-        if (timeoutId) clearTimeout(timeoutId);
-        const newTimeoutId = setTimeout(() => setErrorMessage(false), 3000);
-        setTimeoutId(newTimeoutId);
-        return;
-      }
+        if (!response.ok) {
+            const errorData = await response.text();
+            setErrorMessage(errorData);
+            return;
+        }
 
-      if (!response.ok) throw new Error('Error adding room');
-
-      setSuccessMessage(true);
-      clearForm();
-      setTimeout(() => setSuccessMessage(false), 2000);
-
+        const savedRoom = await response.json();
+        setSuccessMessage('Room registered successfully!');
+        clearForm();
     } catch (error) {
-      console.error('Error adding room:', error);
-    }
-  };
+        console.error('Error adding room:', error);
+        setErrorMessage('An error occurred while adding the room.');
+    } 
+};
+
 
   const clearForm = () => {
     setRoomNum('');
@@ -65,7 +66,7 @@ function AddRoom() {
     setAcType('');
     setAmountPerDay('');
     setAvailability(true);
-    setDescription(''); // Clear description field
+    setDescription('');
   };
 
   useEffect(() => {
@@ -76,30 +77,30 @@ function AddRoom() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-6">ADD ROOMS</h1>
+      <h1 className="text-2xl font-bold mb-6">Add Room</h1>
       
-      <form className="flex flex-col gap-4 p-6 bg-white rounded-lg shadow-lg w-full max-w-lg" onSubmit={handleSubmit}>
+      <form className="row g-3 p-6 bg-white rounded-lg shadow-lg w-full max-w-lg" onSubmit={handleSubmit}>
 
         {/* Success Message */}
         {successMessage && (
-          <Alert color="success" onDismiss={() => setSuccessMessage(false)}>
-            <span className="font-medium">Room registered successfully!</span>
+          <Alert color="success" onDismiss={() => setSuccessMessage('')} className="col-12 mb-4">
+            <span className="font-medium">{successMessage}</span>
           </Alert>
         )}
 
         {/* Error Message */}
         {errorMessage && (
-          <Alert color="failure" icon={HiInformationCircle} onDismiss={() => setErrorMessage(false)}>
-            <span className="font-medium">Duplicate room entry! Please try again.</span>
+          <Alert color="failure" icon={HiInformationCircle} onDismiss={() => setErrorMessage('')} className="col-12 mb-4">
+            <span className="font-medium">{errorMessage}</span>
           </Alert>
         )}
 
         {/* Room Number */}
-        <div>
+        <div className="col-md-6">
           <Label htmlFor="roomNum" value="Room Number" />
           <TextInput
             id="roomNum"
-            type="text"
+            type="number"
             placeholder="Enter Room Number"
             required
             shadow
@@ -108,27 +109,26 @@ function AddRoom() {
           />
         </div>
 
-       {/* Room Type Dropdown */}
-<div className="mb-4"> {/* Add margin-bottom for spacing */}
-  <Label htmlFor="roomType" value="Room Type :" />
-  <select
-    id="roomType"
-    className="form-select shadow border border-blue-500 rounded-lg focus:ring focus:ring-blue-300 transition duration-200 ease-in-out"
-    required
-    value={roomType}
-    onChange={(e) => setRoomType(e.target.value)}
-  >
-    <option value="" disabled>Select Room Type</option>
-    <option value="Single">Single</option>
-    <option value="Double">Double</option>
-    <option value="Family">Family</option>
-  </select>
-</div>
-
+        {/* Room Type Dropdown */}
+        <div className="col-md-6">
+          <Label htmlFor="roomType" value="Room Type:" />
+          <select
+            id="roomType"
+            className="form-select shadow border border-blue-500 rounded-lg focus:ring focus:ring-blue-300 transition duration-200 ease-in-out w-full"
+            required
+            value={roomType}
+            onChange={(e) => setRoomType(e.target.value)}
+          >
+            <option value="" disabled>Select Room Type</option>
+            <option value="Single">Single</option>
+            <option value="Double">Double</option>
+            <option value="Family">Family</option>
+          </select>
+        </div>
 
         {/* AC Type Radio Buttons */}
-        <div>
-          <Label htmlFor="acType" value="AC Type" />
+        <div className="col-md-6">
+          <Label value="AC Type" />
           <div className="flex gap-4 mt-2">
             <label className="flex items-center gap-2">
               <input
@@ -142,7 +142,6 @@ function AddRoom() {
               />
               <span>AC</span>
             </label>
-
             <label className="flex items-center gap-2">
               <input
                 type="radio"
@@ -158,12 +157,12 @@ function AddRoom() {
         </div>
 
         {/* Amount per Day */}
-        <div>
+        <div className="col-md-6">
           <Label htmlFor="amountPerDay" value="Amount per Day" />
           <TextInput
             id="amountPerDay"
             type="number"
-            placeholder="Rs :Enter Amount per Day"
+            placeholder="Rs: Enter Amount per Day"
             required
             shadow
             value={amountPerDay}
@@ -172,31 +171,39 @@ function AddRoom() {
         </div>
 
         {/* Room Description */}
-        <div className="flex flex-col items-center">
-          <Label htmlFor="description" value="Room Description" className="text-center mb-2" />
+        <div className="col-12">
+          <Label htmlFor="description" value="Room Description" />
           <textarea
             id="description"
-            className="form-control shadow mt-2 p-2 w-full max-w-lg overflow-y-auto resize-none" // Ensure the scrollbar appears
+            className="form-control shadow mt-2 p-2 w-full border border-gray-300 rounded-lg focus:ring focus:ring-blue-300"
             placeholder="Enter room description (e.g., room features, view, amenities)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows="6" // Increased rows for a larger text area
+            rows="4"
             required
           />
         </div>
 
-        {/* Availability */}
-        <div className="flex items-center gap-2">
-          <Label htmlFor="availability" value="Available" />
-          <input
-            id="availability"
-            type="checkbox"
-            checked={availability}
-            onChange={(e) => setAvailability(e.target.checked)}
-          />
+        {/* Availability Checkbox */}
+        <div className="col-12">
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="availability"
+              checked={availability}
+              onChange={(e) => setAvailability(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="availability">
+              Available
+            </label>
+          </div>
         </div>
+        <br/>
 
-        <Button type="submit">Add Room</Button>
+        <div className="col-12">
+          <Button type="submit" className="w-full btn btn-primary">Add Room</Button>
+        </div>
       </form>
     </div>
   );
