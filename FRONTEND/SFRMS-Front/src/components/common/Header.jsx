@@ -1,8 +1,10 @@
 import React from 'react'
 import { Navbar, Button } from 'flowbite-react'
 import Logo from '../../assets/300x300.png'
+import { useLocation } from 'react-router-dom';
 
 export default function Header() {
+  const location = useLocation(); // Get current route location
   const isAuthenticated = !!localStorage.getItem('token'); // Check if user is logged in
 
   const handleLogout = () => {
@@ -18,20 +20,12 @@ export default function Header() {
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">SunFly Room Booking System</span>
       </Navbar.Brand>
       <div className="flex md:order-2">
-        {isAuthenticated && (
-          <Button className=' bg-sky-600' onClick={handleLogout}>Log Out</Button> // Show only if logged in
+        {/* Show the logout button only if the user is authenticated and not on the login page */}
+        {isAuthenticated && location.pathname !== '/login' && (
+          <Button className='bg-sky-600' onClick={handleLogout}>Log Out</Button>
         )}
         <Navbar.Toggle />
       </div>
-      <Navbar.Collapse>
-        <Navbar.Link href="#" active>
-          Home
-        </Navbar.Link>
-        <Navbar.Link href="#">About</Navbar.Link>
-        <Navbar.Link href="#">Services</Navbar.Link>
-        <Navbar.Link href="#">Pricing</Navbar.Link>
-        <Navbar.Link href="#">Contact</Navbar.Link>
-      </Navbar.Collapse>
     </Navbar>
   )
 }

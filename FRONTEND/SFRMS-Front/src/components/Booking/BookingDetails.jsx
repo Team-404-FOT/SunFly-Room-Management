@@ -85,9 +85,6 @@ export default function BookingDetails() {
                             <Table.HeadCell className=' bg-sky-200'>Room Type</Table.HeadCell>
                             <Table.HeadCell className=' bg-sky-200'>AC Type</Table.HeadCell>
                             <Table.HeadCell className=' bg-sky-200'>Special Note</Table.HeadCell>
-                            <Table.HeadCell className=' bg-sky-200'>
-                                <span >ACTION</span>
-                            </Table.HeadCell>
                         </Table.Head>
                         <Table.Body className="divide-y">
                             {currentBookings.map(booking => (
@@ -103,11 +100,6 @@ export default function BookingDetails() {
                                     <Table.Cell>{booking.type}</Table.Cell>
                                     <Table.Cell>{booking.acType}</Table.Cell>
                                     <Table.Cell>{booking.specialNote || 'N/A'}</Table.Cell>
-                                    <Table.Cell>
-                                        <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                                            Edit
-                                        </a>
-                                    </Table.Cell>
                                 </Table.Row>
                             ))}
                         </Table.Body>

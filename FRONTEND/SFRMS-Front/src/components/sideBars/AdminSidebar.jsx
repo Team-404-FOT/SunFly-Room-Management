@@ -108,14 +108,6 @@ export default function AdminSideBar() {
 
             Profile
           </Sidebar.Item>
-          <Sidebar.Item
-            href="/signup"
-            icon={HiTable}
-            active={activeItem === '/signup'}
-            onClick={() => setActiveItem('/signup')}
-          >
-            Sign Up
-          </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>

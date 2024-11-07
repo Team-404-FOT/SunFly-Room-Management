@@ -22,7 +22,7 @@ public class BookingService {
     }
 
     public void addBooking(Bookings booking) {
-        String sql = "CALL insert_booking(?, ?, ?, ?, ?, ?)";
+        String sql = "CALL insert_booking(?, ?, ?, ?, ?, ?)"; //procedure for add booking
 
         jdbcTemplate.update(
                 sql,
