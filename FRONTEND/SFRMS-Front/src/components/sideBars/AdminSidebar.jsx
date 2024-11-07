@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
-import { HiUser, HiUserAdd, HiUserGroup, HiTable, HiPlusCircle, HiClipboardList,HiOutlineHome, HiCog, HiPlus } from 'react-icons/hi'; 
+import { HiUser, HiUserAdd, HiUserGroup, HiTable, HiPlusCircle, HiClipboardList,HiOutlineHome, HiCog, HiPlus, HiCurrencyDollar, HiBookOpen, HiClipboardCheck } from 'react-icons/hi'; 
 import { useLocation } from 'react-router-dom';
 
 export default function AdminSideBar() {
@@ -36,7 +36,7 @@ export default function AdminSideBar() {
           </Sidebar.Collapse>
 
 
-          <Sidebar.Collapse icon={HiUserGroup} label="Booking" active={activeItem.startsWith('/booking')}>
+          <Sidebar.Collapse icon={HiBookOpen} label="Booking" active={activeItem.startsWith('/booking')}>
             <Sidebar.Item
               href="/booking/add"
               icon={HiPlusCircle}
@@ -52,6 +52,14 @@ export default function AdminSideBar() {
               onClick={() => setActiveItem('/booking/registeredBookings')}
             >
               Booked Rooms 
+            </Sidebar.Item>
+            <Sidebar.Item
+              href="/booking/history"
+              icon={HiTable}
+              active={activeItem === '/booking/history'}
+              onClick={() => setActiveItem('/booking/history')}
+            >
+              History
             </Sidebar.Item>
           </Sidebar.Collapse>
 
@@ -76,7 +84,7 @@ export default function AdminSideBar() {
 
           <Sidebar.Item
             href="/payment"
-            icon={HiUserAdd} 
+            icon={HiCurrencyDollar} 
             active={activeItem === '/payment'}
             onClick={() => setActiveItem('/payment')}
           >

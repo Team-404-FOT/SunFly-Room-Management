@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
-import { HiUser, HiUserAdd, HiUserGroup,HiClipboardList,HiPlusCircle, HiTable } from "react-icons/hi";
+import { HiUser, HiUserAdd, HiUserGroup,HiClipboardList,HiPlusCircle, HiTable, HiCurrencyDollar, HiBookOpen } from "react-icons/hi";
 import { useLocation } from 'react-router-dom';
 
 export default function UserSideBar() {
@@ -36,7 +36,7 @@ export default function UserSideBar() {
           </Sidebar.Collapse>
 
 
-          <Sidebar.Collapse icon={HiUserGroup} label="Booking" active={activeItem.startsWith('/booking')}>
+          <Sidebar.Collapse icon={HiBookOpen} label="Booking" active={activeItem.startsWith('/booking')}>
             <Sidebar.Item
               href="/booking/add"
               icon={HiPlusCircle}
@@ -53,6 +53,14 @@ export default function UserSideBar() {
             >
               Booked Rooms 
             </Sidebar.Item>
+            <Sidebar.Item
+              href="/booking/history"
+              icon={HiTable}
+              active={activeItem === '/booking/history'}
+              onClick={() => setActiveItem('/booking/history')}
+            >
+              History
+            </Sidebar.Item>
           </Sidebar.Collapse>
 
           <Sidebar.Item
@@ -64,27 +72,8 @@ export default function UserSideBar() {
             Add Payment
           </Sidebar.Item>
           <Sidebar.Item
-            href="/Rooms/Addrooms"
-            icon={HiUserAdd} // Replace with an appropriate icon
-            active={activeItem === '/Rooms/Addrooms'}
-            onClick={() => setActiveItem('/Rooms/Addrooms')}
-          >
-            Add Rooms
-          </Sidebar.Item>
-          
-          
-          <Sidebar.Item
-            href="/Rooms/RoomManagement"
-            icon={HiUserAdd} // Replace with an appropriate icon
-            active={activeItem === '/Rooms/RoomManagement'}
-            onClick={() => setActiveItem('/Rooms/RoomManagement')}
-          >
-            Rooms Management
-          </Sidebar.Item>
-          
-          <Sidebar.Item
             href="/profile"
-            icon={HiUser}
+            icon={HiCurrencyDollar}
             active={activeItem === '/profile'}
             onClick={() => setActiveItem('/profile')}
           >

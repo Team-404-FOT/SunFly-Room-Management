@@ -141,7 +141,7 @@ function RoomManagement() {
             />
           </div>
         </form>
-        <Button onClick={() => navigate('/Rooms/Addrooms')}>Add Room</Button>
+        <Button className=' bg-sky-600' onClick={() => navigate('/Rooms/Addrooms')}>Add Room</Button>
       </div>
 
       <div>
