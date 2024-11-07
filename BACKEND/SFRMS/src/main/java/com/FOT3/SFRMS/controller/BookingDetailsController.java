@@ -1,6 +1,7 @@
 package com.FOT3.SFRMS.controller;
 
 import com.FOT3.SFRMS.dto.BookingDetailsResponse;
+import com.FOT3.SFRMS.dto.PaymentHistoryDTO;
 import com.FOT3.SFRMS.dto.PaymentRequest;
 import com.FOT3.SFRMS.service.BookingDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,11 @@ public class BookingDetailsController {
             @RequestParam("checkOut") String checkOut,
             @RequestParam("bookingId") int bookingId) {
         return bookingDetailsService.calculateAmount(checkOut, bookingId);
+    }
+
+    @GetMapping("/payment-history")
+    public List<PaymentHistoryDTO> getAllPaymentHistory() {
+        return bookingDetailsService.findAllPaymentHistory();
     }
 
 

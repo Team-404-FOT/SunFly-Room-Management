@@ -18,7 +18,7 @@ import Addrooms from './components/Rooms/Addrooms';
 import RoomManagement from './components/Rooms/RoomManagement';
 import { useEffect } from "react";
 import BookingHistory from './components/Booking/BookingHistory';
-
+import PaymentHistory from './components/Payment/PaymentHistory';
 
 
 
@@ -52,13 +52,15 @@ function App() {
     "/customer/RegisteredCustomers",
     "/booking/registeredBookings",
     "/booking/history"
+    "/payment-history"
   ];
 
   // Function to check if the current route is an admin route
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
 
   // Define routes where the user sidebar should appear
-  const userRoutes = ["/profile", "/customer/add", "/booking/add", "/payment", "/customer/RegisteredCustomers", "/booking/registeredBookings", "/booking/history"];
+  const userRoutes = ["/profile", "/customer/add", "/booking/add", "/payment", "/customer/RegisteredCustomers", "/booking/registeredBookings", "/booking/history" , "/payment-history"];
+
 
   // Function to check if the current route is a user route
   const isUserRoute = userRoutes.some((route) => location.pathname.startsWith(route));
@@ -84,6 +86,9 @@ function App() {
             <Route path="/customer/add" element={<AddCustomer />} />
             <Route path="/booking/add" element={<BookRoom />} />
             <Route path="/payment" element={<AddPay />} />
+            <Route path="/payment-history" element={<PaymentHistory/>}/>
+            <Route path="/Rooms/Addrooms" element={<Addrooms />} />
+            <Route path="/Rooms/RoomManagement" element={<RoomManagement />} />
             <Route path="/customer/RegisteredCustomers" element={<RegisteredCustomers />} />
             <Route path="/booking/registeredBookings" element={<BookingDetails />} />
             <Route path="/booking/history" element={<BookingHistory />} />
