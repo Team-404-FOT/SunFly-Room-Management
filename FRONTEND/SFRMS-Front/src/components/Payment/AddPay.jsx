@@ -1,56 +1,166 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label, TextInput, Dropdown, Button, Table } from "flowbite-react";
 
 function AddPay() {
+  const token = localStorage.getItem("token"); // Assuming token is stored in local storage
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [paymentType, setPaymentType] = useState('');
   const [cashPaid, setCashPaid] = useState('');
   const [balance, setBalance] = useState(null);
+  const [bookedRooms, setBookedRooms] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0); // State to hold total price
+  const [error, setError] = useState(null); // State for error handling
 
-  // Dummy data for booked rooms
-  const bookedRooms = [
-    { id: 1, roomNumber: "R001", customerName: "John Doe", roomType: "Double", acType: "AC", price: 1000, checkIn: "2024-10-01", checkOut: "" },
-    { id: 2, roomNumber: "R002", customerName: "Jane Smith", roomType: "Single", acType: "Non-AC", price: 700, checkIn: "2024-10-05", checkOut: "" },
-    // Add more dummy data as needed
-  ];
+  // Fetch booking data from backend
+  useEffect(() => {
+    
+    fetchBookedRooms();
+  }, [token]);
+
+  const fetchBookedRooms = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/bookings/details', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch booking details');
+      }
+      const data = await response.json();
+      setBookedRooms(data);
+      console.log(data); // For debugging purposes
+    } catch (error) {
+      console.error('Error fetching booking details:', error);
+    }
+  };
 
   // Function to get the current date in the format YYYY-MM-DD
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
   const handleSearch = () => {
-    const result = bookedRooms.find(room => room.roomNumber === searchTerm || room.customerName.toLowerCase().includes(searchTerm.toLowerCase()));
+    const result = bookedRooms.find(room =>
+      room.roomNum === searchTerm || room.customerName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     if (result) {
-      setSelectedRoom({ ...result, checkOut: getCurrentDate() }); // Set current date as checkout date
+      setSelectedRoom({ ...result, checkOut: getCurrentDate() });
     } else {
       setSelectedRoom(null);
     }
   };
 
   const calculateBalance = () => {
-    if (cashPaid && selectedRoom) {
-      setBalance(cashPaid - selectedRoom.price);
+    if (cashPaid && totalPrice) {
+      setBalance(cashPaid - totalPrice);
     }
   };
 
-  const handlePayment = () => {
+  const fetchTotalPrice = async (bookingId, checkOut) => {
+  try {
+    const response = await fetch(`http://localhost:8080/bookings/calculate-amount?checkOut=${checkOut}&bookingId=${bookingId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch total price');
+    }
+
+    const data = await response.json();
+    console.log("Full response data:", data); // Log the full response for debugging
+
+    if (data['#result-set-1'] && Array.isArray(data['#result-set-1']) && data['#result-set-1'].length > 0) {
+      const bookingData = data['#result-set-1'][0];
+      console.log("Booking data:", bookingData); // Log booking data for inspection
+
+      const totalCalculatedAmount = bookingData?.total_calculated_amount;
+      const amountPerDay = bookingData?.amountPerDay;
+
+      if (typeof totalCalculatedAmount === 'number') {
+        setTotalPrice(totalCalculatedAmount);
+        setError(null); // Clear any previous error
+      } else if (typeof amountPerDay === 'number') {
+        setTotalPrice(amountPerDay);
+        setError('Showing daily rate as total amount');
+      } else {
+        console.warn("Unexpected data format: total_calculated_amount and amountPerDay are missing.");
+        setError('Unexpected data format for total_calculated_amount and amountPerDay');
+      }
+    } else if (data.message) {
+      // Handle the case where no valid booking is found
+      console.warn(data.message); // Log the specific message
+      setError(data.message); // Show the message as an error
+    } else {
+      setError('Unexpected response structure');
+    }
+  } catch (error) {
+    console.error('Error fetching total price:', error);
+    setError('Error fetching total price');
+  }
+};
+
+  
+
+
+
+  const handleCheckout = (room) => {
+    const checkOutDate = getCurrentDate();
+    setSelectedRoom({ ...room, checkOut: checkOutDate });
+    fetchTotalPrice(room.bookingId, checkOutDate); // Call the function to get the total price
+  };
+
+  const handlePayment = async () => {
     if (selectedRoom) {
-      console.log("Payment made for room:", selectedRoom.roomNumber);
-      setSelectedRoom(null);
-      setPaymentType('');
-      setCashPaid('');
-      setBalance(null);
+      try {
+        console.log(selectedRoom);
+        // Prepare payment data based on selected room details and user inputs
+        const paymentData = {
+          bookingId: selectedRoom.bookingId,
+          type: selectedRoom.type,
+          acType: selectedRoom.acType,
+          cusName: selectedRoom.customerName,
+          paymentMethod: paymentType,
+          checkIn: `${selectedRoom.bookingDate}T00:00:00`, // Include time component
+          checkOut: `${selectedRoom.checkOut}T00:00:00`,   // Include time component
+          amount: totalPrice,
+        };
+  
+        // Make POST request to add payment endpoint
+        const response = await fetch('http://localhost:8080/bookings/add-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Include token for authorization
+          },
+          body: JSON.stringify(paymentData),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to add payment');
+        }
+  
+        // Successfully added payment, reset states and notify user
+        console.log("Payment added successfully!");
+        setSelectedRoom(null); // Clear selected room
+        setPaymentType('');     // Clear payment type
+        setCashPaid('');        // Clear cash paid input
+        setBalance(null);       // Clear balance
+        setTotalPrice(0);       // Reset total price
+        fetchBookedRooms();
+      } catch (error) {
+        console.error('Error adding payment:', error);
+        setError('Failed to process payment'); // Display error message
+      }
     }
   };
+
 
   return (
-    <div className="flex h-screen p-8 bg-gray-100">
+    <div className="flex h-screen p-8 bg-gray-200">
       {/* Left Side: Search and Booked Rooms */}
       <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 rounded-lg shadow-lg overflow-y-auto">
         
@@ -79,13 +189,13 @@ function AddPay() {
           </Table.Head>
           <Table.Body className="divide-y">
             {bookedRooms.map((room) => (
-              <Table.Row key={room.id} className="bg-white">
-                <Table.Cell>{room.roomNumber}</Table.Cell>
+              <Table.Row key={room.bookingId} className="bg-white">
+                <Table.Cell>{room.roomNum}</Table.Cell>
                 <Table.Cell>{room.customerName}</Table.Cell>
-                <Table.Cell>{room.roomType}</Table.Cell>
+                <Table.Cell>{room.type}</Table.Cell>
                 <Table.Cell>{room.acType}</Table.Cell>
                 <Table.Cell>
-                  <Button size="xs" onClick={() => setSelectedRoom({ ...room, checkOut: getCurrentDate() })} color="success">Checkout</Button>
+                  <Button size="xs" onClick={() => handleCheckout(room)} color="success">Checkout</Button>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -95,8 +205,8 @@ function AddPay() {
 
       {/* Right Side: Payment Window */}
       {selectedRoom && (
-        <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 border border-gray-200 rounded-lg shadow-lg overflow-y-auto">
-          <h3 className="font-semibold text-lg">Payment Details for Room {selectedRoom.roomNumber}</h3>
+        <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 border border-gray-300 rounded-lg shadow-lg overflow-y-auto">
+          <h3 className="font-semibold text-lg">Payment Details for Room {selectedRoom.roomNum}</h3>
           
           {/* Room and Payment Information */}
           <div className="space-y-2">
@@ -109,7 +219,7 @@ function AddPay() {
             <Label value="Room Type" />
             <TextInput
               readOnly
-              value={selectedRoom.roomType}
+              value={selectedRoom.type}
               className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
             />
             <Label value="AC Type" />
@@ -121,7 +231,7 @@ function AddPay() {
             <Label value="Check-in Date" />
             <TextInput
               readOnly
-              value={selectedRoom.checkIn}
+              value={selectedRoom.bookingDate}
               className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
             />
             <Label value="Check-out Date" />
@@ -133,7 +243,7 @@ function AddPay() {
             <Label value="Total Price" />
             <TextInput
               readOnly
-              value={`$${selectedRoom.price}`}
+              value={`$${totalPrice.toFixed(2)}`} // Display the calculated total price
               className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>
@@ -171,6 +281,7 @@ function AddPay() {
 
           {/* Finalize Payment */}
           <Button onClick={handlePayment} color="green" className="w-full mt-4">Make Payment</Button>
+          {error && <p className="text-red-500 mt-2">{error}</p>} {/* Display error message if any */}
         </div>
       )}
     </div>
