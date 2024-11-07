@@ -51,7 +51,7 @@ export default function AdminSideBar() {
               active={activeItem === '/booking/registeredBookings'}
               onClick={() => setActiveItem('/booking/registeredBookings')}
             >
-              Booked Rooms 
+              Available 
             </Sidebar.Item>
             <Sidebar.Item
               href="/booking/history"
