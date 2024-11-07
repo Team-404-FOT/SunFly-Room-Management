@@ -71,7 +71,7 @@ public class BookingService {
     }
 
     public List<BookingHistoryDTO> getBookingHistory() {
-        String sql = "SELECT * FROM BookingHistory";
+        String sql = "SELECT * FROM BookingHistory"; //get data from BookingHistory View
 
         return jdbcTemplate.query(sql, new RowMapper<BookingHistoryDTO>() {
             @Override
@@ -90,5 +90,10 @@ public class BookingService {
                 return bookingHistory;
             }
         });
+    }
+
+    public void deleteBooking(int bookingId) {
+        String sql = "CALL delete_booking(?)"; // Call the delete_booking procedure
+        jdbcTemplate.update(sql, bookingId);
     }
 }

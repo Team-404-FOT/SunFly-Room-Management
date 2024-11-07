@@ -51,7 +51,7 @@ export default function UserSideBar() {
               active={activeItem === '/booking/registeredBookings'}
               onClick={() => setActiveItem('/booking/registeredBookings')}
             >
-              Booked Rooms 
+              Available 
             </Sidebar.Item>
             <Sidebar.Item
               href="/booking/history"
@@ -65,7 +65,7 @@ export default function UserSideBar() {
 
           <Sidebar.Item
             href="/payment"
-            icon={HiUserAdd} // Replace with an appropriate icon
+            icon={HiCurrencyDollar} // Replace with an appropriate icon
             active={activeItem === '/payment'}
             onClick={() => setActiveItem('/payment')}
           >
@@ -73,33 +73,15 @@ export default function UserSideBar() {
           </Sidebar.Item>
           <Sidebar.Item
             href="/payment-history"
-            icon={HiUserAdd} 
+            icon={HiCurrencyDollar} // Replace with an appropriate icon
             active={activeItem === '/payment-history'}
             onClick={() => setActiveItem('/payment-history')}
           >
             Payment History
           </Sidebar.Item>
           <Sidebar.Item
-            href="/Rooms/Addrooms"
-            icon={HiUserAdd} // Replace with an appropriate icon
-            active={activeItem === '/Rooms/Addrooms'}
-            onClick={() => setActiveItem('/Rooms/Addrooms')}
-          >
-            Add Rooms
-          </Sidebar.Item>
-          
-          <Sidebar.Item
-            href="/Rooms/RoomManagement"
-            icon={HiUserAdd} // Replace with an appropriate icon
-            active={activeItem === '/Rooms/RoomManagement'}
-            onClick={() => setActiveItem('/Rooms/RoomManagement')}
-          >
-            Rooms Management
-          </Sidebar.Item>
-          
-          <Sidebar.Item
             href="/profile"
-            icon={HiCurrencyDollar}
+            icon={HiUser} // Replace with an appropriate icon
             active={activeItem === '/profile'}
             onClick={() => setActiveItem('/profile')}
           >

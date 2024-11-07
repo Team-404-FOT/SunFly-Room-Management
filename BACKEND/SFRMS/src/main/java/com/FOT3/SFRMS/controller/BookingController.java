@@ -49,4 +49,16 @@ public class BookingController {
     public List<BookingHistoryDTO> getBookingHistory() {
         return bookingService.getBookingHistory();
     }
+
+    @DeleteMapping("/delete/{bookingId}")
+    public ResponseEntity<String> deleteBooking(@PathVariable int bookingId) {
+        try {
+            bookingService.deleteBooking(bookingId);
+            return new ResponseEntity<>("Booking deleted successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to delete booking: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

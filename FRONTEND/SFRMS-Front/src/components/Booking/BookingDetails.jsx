@@ -35,8 +35,28 @@ export default function BookingDetails() {
         }
     };
 
+    // Delete booking function
+    const deleteBooking = async (bookingId) => {
+        try {
+            const response = await fetch(`http://localhost:8080/bookings/delete/${bookingId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete booking');
+            }
+
+            // Remove the deleted booking from the state
+            setActiveBookings(activeBookings.filter(booking => booking.bookingId !== bookingId));
+            console.log(`Booking ${bookingId} deleted successfully`);
+        } catch (error) {
+            console.error('Error deleting booking:', error);
+        }
+    };
+
     // Filtered bookings based on search terms
-    const filteredBookings = activeBookings.filter(booking => 
+    const filteredBookings = activeBookings.filter(booking =>
         (!nicSearch || booking.nic?.toLowerCase().includes(nicSearch.toLowerCase())) &&
         (!roomNumSearch || booking.roomNum.toString().includes(roomNumSearch))
     );
@@ -53,7 +73,7 @@ export default function BookingDetails() {
     return (
         <div className='w-full h-full p-5 bg-gray-100'>
             <div>
-                <h1 className='mb-5 text-2xl'>Booking Details</h1>
+                <h1 className='mb-5 text-2xl'>Available Bookings</h1>
 
                 {/* Search Inputs */}
                 <div className="flex space-x-4 mb-4">
@@ -85,6 +105,7 @@ export default function BookingDetails() {
                             <Table.HeadCell className=' bg-sky-200'>Room Type</Table.HeadCell>
                             <Table.HeadCell className=' bg-sky-200'>AC Type</Table.HeadCell>
                             <Table.HeadCell className=' bg-sky-200'>Special Note</Table.HeadCell>
+                            <Table.HeadCell className=' bg-sky-200'>Actions</Table.HeadCell>
                         </Table.Head>
                         <Table.Body className="divide-y">
                             {currentBookings.map(booking => (
@@ -100,6 +121,14 @@ export default function BookingDetails() {
                                     <Table.Cell>{booking.type}</Table.Cell>
                                     <Table.Cell>{booking.acType}</Table.Cell>
                                     <Table.Cell>{booking.specialNote || 'N/A'}</Table.Cell>
+                                    <Table.Cell>
+                                        <span
+                                            onClick={() => deleteBooking(booking.bookingId)}
+                                            className="text-red-500 cursor-pointer hover:underline"
+                                        >
+                                            Delete
+                                        </span>
+                                    </Table.Cell>
                                 </Table.Row>
                             ))}
                         </Table.Body>
