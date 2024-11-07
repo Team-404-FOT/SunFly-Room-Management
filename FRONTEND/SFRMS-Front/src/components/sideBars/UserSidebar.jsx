@@ -64,6 +64,14 @@ export default function UserSideBar() {
             Add Payment
           </Sidebar.Item>
           <Sidebar.Item
+            href="/payment-history"
+            icon={HiUserAdd} 
+            active={activeItem === '/payment-history'}
+            onClick={() => setActiveItem('/payment-history')}
+          >
+            Payment History
+          </Sidebar.Item>
+          <Sidebar.Item
             href="/Rooms/Addrooms"
             icon={HiUserAdd} // Replace with an appropriate icon
             active={activeItem === '/Rooms/Addrooms'}

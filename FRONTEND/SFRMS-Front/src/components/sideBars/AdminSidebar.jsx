@@ -82,6 +82,14 @@ export default function AdminSideBar() {
           >
             Add Payment
           </Sidebar.Item>
+          <Sidebar.Item
+            href="/payment-history"
+            icon={HiUserAdd} 
+            active={activeItem === '/payment-history'}
+            onClick={() => setActiveItem('/payment-history')}
+          >
+            Payment History
+          </Sidebar.Item>
 
           <Sidebar.Item
             href="/register"
