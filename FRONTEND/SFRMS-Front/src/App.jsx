@@ -17,8 +17,8 @@ import BookingDetails from './components/Booking/BookingDetails';
 import Addrooms from './components/Rooms/Addrooms';
 import RoomManagement from './components/Rooms/RoomManagement';
 import { useEffect } from "react";
+import BookingHistory from './components/Booking/BookingHistory';
 import PaymentHistory from './components/Payment/PaymentHistory';
-
 
 
 
@@ -51,6 +51,7 @@ function App() {
     "/Rooms/RoomManagement",
     "/customer/RegisteredCustomers",
     "/booking/registeredBookings",
+    "/booking/history"
     "/payment-history"
   ];
 
@@ -58,7 +59,8 @@ function App() {
   const isAdminRoute = adminRoutes.some((route) => location.pathname.startsWith(route));
 
   // Define routes where the user sidebar should appear
-  const userRoutes = ["/profile", "/customer/add", "/booking/add", "/payment", "/Rooms/Addrooms", "/Rooms/RoomManagement", "/customer/RegisteredCustomers", "/booking/registeredBookings","/payment-history"];
+  const userRoutes = ["/profile", "/customer/add", "/booking/add", "/payment", "/customer/RegisteredCustomers", "/booking/registeredBookings", "/booking/history" , "/payment-history"];
+
 
   // Function to check if the current route is a user route
   const isUserRoute = userRoutes.some((route) => location.pathname.startsWith(route));
@@ -89,6 +91,7 @@ function App() {
             <Route path="/Rooms/RoomManagement" element={<RoomManagement />} />
             <Route path="/customer/RegisteredCustomers" element={<RegisteredCustomers />} />
             <Route path="/booking/registeredBookings" element={<BookingDetails />} />
+            <Route path="/booking/history" element={<BookingHistory />} />
 
             {/* Admin-only routes */}
             {UserService.adminOnly() && (
@@ -96,6 +99,8 @@ function App() {
                 <Route path="/register" element={<RegistrationPage />} />
                 <Route path="/admin/user-management" element={<UserManagementPage />} />
                 <Route path="/update-user/:userId" element={<UpdateUser />} />
+                <Route path="/Rooms/Addrooms" element={<Addrooms />} />
+                <Route path="/Rooms/RoomManagement" element={<RoomManagement />} />
 
               </>
             )}

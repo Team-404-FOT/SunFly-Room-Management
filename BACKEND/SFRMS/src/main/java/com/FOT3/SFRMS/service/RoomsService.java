@@ -108,7 +108,7 @@ public class RoomsService implements RoomService {
         String sql = "DELETE FROM rooms WHERE room_num = ?";
 
         try {
-            Rooms existingRoom = roomsRepo.findById(roomNum).orElseThrow(() -> new ServiceException("Room not found"));
+            //Rooms existingRoom = roomsRepo.findById(roomNum).orElseThrow(() -> new ServiceException("Room not found"));
             jdbcTemplate.update(sql, roomNum);
         } catch (DataAccessException e) {
             String errorMessage = e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : "Error deleting room.";

@@ -243,7 +243,7 @@ function AddPay() {
             <Label value="Total Price" />
             <TextInput
               readOnly
-              value={`$${totalPrice.toFixed(2)}`} // Display the calculated total price
+              value={`Rs.${totalPrice.toFixed(2)}`} // Display the calculated total price
               className="border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
             />
           </div>

@@ -77,7 +77,7 @@ function AddRoom() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-6">Add Room</h1>
+      <h1 className="text-2xl font-bold mb-6 ">Add Room</h1>
       
       <form className="row g-3 p-6 bg-white rounded-lg shadow-lg w-full max-w-lg" onSubmit={handleSubmit}>
 
@@ -147,8 +147,8 @@ function AddRoom() {
                 type="radio"
                 id="acTypeNonAC"
                 name="acType"
-                value="Non-AC"
-                checked={acType === "Non-AC"}
+                value="NonAC"
+                checked={acType === "NonAC"}
                 onChange={(e) => setAcType(e.target.value)}
               />
               <span>Non-AC</span>

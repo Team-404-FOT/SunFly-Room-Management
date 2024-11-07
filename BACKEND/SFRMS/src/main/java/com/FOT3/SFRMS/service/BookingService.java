@@ -1,10 +1,12 @@
 package com.FOT3.SFRMS.service;
 
 import com.FOT3.SFRMS.dto.ActiveBookingDetails;
+import com.FOT3.SFRMS.dto.BookingHistoryDTO;
 import com.FOT3.SFRMS.dto.PaymentRequest;
 import com.FOT3.SFRMS.entity.Bookings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
@@ -66,5 +68,27 @@ public class BookingService {
                 paymentRequest.getCheckIn(),
                 paymentRequest.getCheckOut(),
                 paymentRequest.getAmount());
+    }
+
+    public List<BookingHistoryDTO> getBookingHistory() {
+        String sql = "SELECT * FROM BookingHistory";
+
+        return jdbcTemplate.query(sql, new RowMapper<BookingHistoryDTO>() {
+            @Override
+            public BookingHistoryDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+                BookingHistoryDTO bookingHistory = new BookingHistoryDTO();
+                bookingHistory.setBookingId(rs.getInt("booking_id"));
+                bookingHistory.setCheckIn(rs.getDate("check_in"));
+                bookingHistory.setCheckOut(rs.getDate("check_out"));
+                bookingHistory.setRoomNum(rs.getInt("room_num"));
+                bookingHistory.setCustomerName(rs.getString("customer_name"));
+                bookingHistory.setNic(rs.getString("nic"));
+                bookingHistory.setPhoneNumber(rs.getString("phone_number"));
+                bookingHistory.setType(rs.getString("type"));
+                bookingHistory.setActype(rs.getString("actype"));
+                bookingHistory.setSpecialNote(rs.getString("special_note"));
+                return bookingHistory;
+            }
+        });
     }
 }

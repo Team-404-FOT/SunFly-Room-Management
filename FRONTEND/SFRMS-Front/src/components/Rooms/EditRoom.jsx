@@ -51,7 +51,7 @@ function EditRoom({ room, setRoom, onUpdate, closeModal }) {
         >
           <option value="" disabled>Select AC Type</option>
           <option value="AC">AC</option>
-          <option value="Non-AC">Non-AC</option>
+          <option value="NonAC">Non-AC</option>
         </select>
       </div>
 
