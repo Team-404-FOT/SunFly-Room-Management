@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
-import { HiUser, HiUserAdd, HiUserGroup, HiTable, HiPlusCircle, HiClipboardList,HiOutlineHome, HiCog, HiPlus, HiCurrencyDollar, HiBookOpen, HiClipboardCheck } from 'react-icons/hi'; 
+import { HiUser, HiUserAdd, HiUserGroup, HiTable, HiPlusCircle, HiClipboardList,HiOutlineHome, HiCog, HiPlus, HiCurrencyDollar, HiBookOpen, HiClipboardCheck, HiUserCircle } from 'react-icons/hi'; 
 import { useLocation } from 'react-router-dom';
 
 export default function AdminSideBar() {
@@ -92,7 +92,7 @@ export default function AdminSideBar() {
           </Sidebar.Item>
           <Sidebar.Item
             href="/payment-history"
-            icon={HiUserAdd} 
+            icon={HiTable} 
             active={activeItem === '/payment-history'}
             onClick={() => setActiveItem('/payment-history')}
           >
