@@ -51,7 +51,7 @@ function App() {
     "/Rooms/RoomManagement",
     "/customer/RegisteredCustomers",
     "/booking/registeredBookings",
-    "/booking/history"
+    "/booking/history",
     "/payment-history"
   ];
 

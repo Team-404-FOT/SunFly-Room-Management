@@ -11,10 +11,12 @@ function AddPay() {
   const [bookedRooms, setBookedRooms] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0); // State to hold total price
   const [error, setError] = useState(null); // State for error handling
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
 
   // Fetch booking data from backend
   useEffect(() => {
-    
+
     fetchBookedRooms();
   }, [token]);
 
@@ -61,49 +63,49 @@ function AddPay() {
   };
 
   const fetchTotalPrice = async (bookingId, checkOut) => {
-  try {
-    const response = await fetch(`http://localhost:8080/bookings/calculate-amount?checkOut=${checkOut}&bookingId=${bookingId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const response = await fetch(`http://localhost:8080/bookings/calculate-amount?checkOut=${checkOut}&bookingId=${bookingId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch total price');
-    }
-
-    const data = await response.json();
-    console.log("Full response data:", data); // Log the full response for debugging
-
-    if (data['#result-set-1'] && Array.isArray(data['#result-set-1']) && data['#result-set-1'].length > 0) {
-      const bookingData = data['#result-set-1'][0];
-      console.log("Booking data:", bookingData); // Log booking data for inspection
-
-      const totalCalculatedAmount = bookingData?.total_calculated_amount;
-      const amountPerDay = bookingData?.amountPerDay;
-
-      if (typeof totalCalculatedAmount === 'number') {
-        setTotalPrice(totalCalculatedAmount);
-        setError(null); // Clear any previous error
-      } else if (typeof amountPerDay === 'number') {
-        setTotalPrice(amountPerDay);
-        setError('Showing daily rate as total amount');
-      } else {
-        console.warn("Unexpected data format: total_calculated_amount and amountPerDay are missing.");
-        setError('Unexpected data format for total_calculated_amount and amountPerDay');
+      if (!response.ok) {
+        throw new Error('Failed to fetch total price');
       }
-    } else if (data.message) {
-      // Handle the case where no valid booking is found
-      console.warn(data.message); // Log the specific message
-      setError(data.message); // Show the message as an error
-    } else {
-      setError('Unexpected response structure');
-    }
-  } catch (error) {
-    console.error('Error fetching total price:', error);
-    setError('Error fetching total price');
-  }
-};
 
-  
+      const data = await response.json();
+      console.log("Full response data:", data); // Log the full response for debugging
+
+      if (data['#result-set-1'] && Array.isArray(data['#result-set-1']) && data['#result-set-1'].length > 0) {
+        const bookingData = data['#result-set-1'][0];
+        console.log("Booking data:", bookingData); // Log booking data for inspection
+
+        const totalCalculatedAmount = bookingData?.total_calculated_amount;
+        const amountPerDay = bookingData?.amountPerDay;
+
+        if (typeof totalCalculatedAmount === 'number') {
+          setTotalPrice(totalCalculatedAmount);
+          setError(null); // Clear any previous error
+        } else if (typeof amountPerDay === 'number') {
+          setTotalPrice(amountPerDay);
+          setError('Showing daily rate as total amount');
+        } else {
+          console.warn("Unexpected data format: total_calculated_amount and amountPerDay are missing.");
+          setError('Unexpected data format for total_calculated_amount and amountPerDay');
+        }
+      } else if (data.message) {
+        // Handle the case where no valid booking is found
+        console.warn(data.message); // Log the specific message
+        setError(data.message); // Show the message as an error
+      } else {
+        setError('Unexpected response structure');
+      }
+    } catch (error) {
+      console.error('Error fetching total price:', error);
+      setError('Error fetching total price');
+    }
+  };
+
+
 
 
 
@@ -128,7 +130,7 @@ function AddPay() {
           checkOut: `${selectedRoom.checkOut}T00:00:00`,   // Include time component
           amount: totalPrice,
         };
-  
+
         // Make POST request to add payment endpoint
         const response = await fetch('http://localhost:8080/bookings/add-payment', {
           method: 'POST',
@@ -138,11 +140,12 @@ function AddPay() {
           },
           body: JSON.stringify(paymentData),
         });
-  
+
+        console.log(response);
         if (!response.ok) {
           throw new Error('Failed to add payment');
         }
-  
+
         // Successfully added payment, reset states and notify user
         console.log("Payment added successfully!");
         setSelectedRoom(null); // Clear selected room
@@ -151,6 +154,10 @@ function AddPay() {
         setBalance(null);       // Clear balance
         setTotalPrice(0);       // Reset total price
         fetchBookedRooms();
+
+        // Show success alert
+      setPaymentSuccess(true); // Set success state to true
+
       } catch (error) {
         console.error('Error adding payment:', error);
         setError('Failed to process payment'); // Display error message
@@ -158,12 +165,23 @@ function AddPay() {
     }
   };
 
+  if (paymentSuccess) {
+    setTimeout(() => setPaymentSuccess(false), 3000); // Hide after 3 seconds
+  }
+
 
   return (
     <div className="flex h-screen p-8 bg-gray-200">
+      
       {/* Left Side: Search and Booked Rooms */}
       <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 rounded-lg shadow-lg overflow-y-auto">
-        
+        {/* Alert for Payment Success */}
+      {paymentSuccess && (
+        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+          Payment added successfully!
+        </div>
+      )}
+
         {/* Search Section */}
         <form className="flex items-center gap-4 mb-6" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
           <TextInput
@@ -207,7 +225,7 @@ function AddPay() {
       {selectedRoom && (
         <div className="flex flex-col gap-6 w-1/2 p-6 bg-gray-200 border border-gray-300 rounded-lg shadow-lg overflow-y-auto">
           <h3 className="font-semibold text-lg">Payment Details for Room {selectedRoom.roomNum}</h3>
-          
+
           {/* Room and Payment Information */}
           <div className="space-y-2">
             <Label value="Customer" />
