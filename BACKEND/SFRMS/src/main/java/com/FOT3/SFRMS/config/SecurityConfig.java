@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasAnyAuthority("USER")
                         .requestMatchers("/adminuser/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers("/customers/**").hasAnyAuthority("ADMIN", "USER") // Allow both ADMIN and USER to add customers
-                        .requestMatchers("/bookings/add-payment").permitAll() // Allow access to this endpoint
+                        .requestMatchers("/bookings/add-payment").hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated())
                 .sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
