@@ -292,7 +292,7 @@ function AddPay() {
               />
               <Button onClick={calculateBalance} color="blue" size="sm">Calculate Balance</Button>
               {cashPaid && balance !== null && (
-                <p className="text-gray-700 font-semibold">Balance: ${balance}</p>
+                <p className="text-gray-700 font-semibold">Balance: Rs.{balance}</p>
               )}
             </div>
           )}
